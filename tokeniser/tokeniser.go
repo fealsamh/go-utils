@@ -81,10 +81,11 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 		cfg = new(Config)
 	}
 	var (
-		state  = top
-		sb     strings.Builder
-		tokens []*Token
-		line   = 1
+		state         = top
+		sb            strings.Builder
+		tokens        []*Token
+		line          = 1
+		prevBackslash bool
 	)
 	for {
 		c, _, err := r.ReadRune()
@@ -139,15 +140,31 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 				sb.Reset()
 			}
 		case qstring:
-			if c != '"' {
-				sb.WriteRune(c)
-				if c == '\n' {
-					line++
+			if c != '"' || prevBackslash {
+				if c == '\\' && !prevBackslash {
+					prevBackslash = true
+				} else {
+					if prevBackslash {
+						prevBackslash = false
+						switch c {
+						case 't':
+							c = '\t'
+						case 'r':
+							c = '\r'
+						case 'n':
+							c = '\n'
+						}
+					}
+					sb.WriteRune(c)
+					if c == '\n' {
+						line++
+					}
 				}
 			} else {
 				state = top
 				tokens = append(tokens, &Token{Type: String, Value: sb.String(), Line: line})
 				sb.Reset()
+				prevBackslash = false
 			}
 		}
 	}
