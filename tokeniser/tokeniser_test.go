@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var gTokens []*Token
+var gTokens []Token
 
 func BenchmarkTokeniser(b *testing.B) {
 	var sb strings.Builder
@@ -17,7 +17,7 @@ func BenchmarkTokeniser(b *testing.B) {
 	code := sb.String()
 	b.ResetTimer()
 	var (
-		tokens []*Token
+		tokens []Token
 		err    error
 	)
 	for n := 0; n < b.N; n++ {
