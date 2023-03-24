@@ -10,12 +10,12 @@ import (
 )
 
 // Parse parses an s-expression from a slice of tokens.
-func Parse(tokens []*tokeniser.Token) ([]interface{}, error) {
+func Parse(tokens []tokeniser.Token) ([]interface{}, error) {
 	list, _, err := parseList(tokens)
 	return list, err
 }
 
-func parseList(tokens []*tokeniser.Token) ([]interface{}, []*tokeniser.Token, error) {
+func parseList(tokens []tokeniser.Token) ([]interface{}, []tokeniser.Token, error) {
 	t := tokens[0]
 	if !(t.Type == tokeniser.Symbol && t.Value == "(") {
 		return nil, nil, fmt.Errorf("expected '(' (line %d)", t.Line)
@@ -39,7 +39,7 @@ func parseList(tokens []*tokeniser.Token) ([]interface{}, []*tokeniser.Token, er
 	}
 }
 
-func parseElem(tokens []*tokeniser.Token) (interface{}, []*tokeniser.Token, error) {
+func parseElem(tokens []tokeniser.Token) (interface{}, []tokeniser.Token, error) {
 	t := tokens[0]
 	if t.Type == tokeniser.Symbol && t.Value == "(" {
 		return parseList(tokens)
