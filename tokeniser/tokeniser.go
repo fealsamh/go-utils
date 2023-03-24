@@ -76,14 +76,14 @@ type Config struct {
 }
 
 // Tokenise tokenises the content of a reader.
-func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
+func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 	if cfg == nil {
 		cfg = new(Config)
 	}
 	var (
 		state         = top
 		sb            strings.Builder
-		tokens        []*Token
+		tokens        []Token
 		line          = 1
 		prevBackslash bool
 	)
@@ -114,7 +114,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 			case c == '"':
 				state = qstring
 			default:
-				tokens = append(tokens, &Token{Type: Symbol, Value: string(c), Line: line})
+				tokens = append(tokens, Token{Type: Symbol, Value: string(c), Line: line})
 			}
 		case comment:
 			if c == '\n' {
@@ -127,7 +127,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 			} else {
 				state = top
 				r.UnreadRune()
-				tokens = append(tokens, &Token{Type: Ident, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Line: line})
 				sb.Reset()
 			}
 		case number:
@@ -136,7 +136,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 			} else {
 				state = top
 				r.UnreadRune()
-				tokens = append(tokens, &Token{Type: Number, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: Number, Value: sb.String(), Line: line})
 				sb.Reset()
 			}
 		case qstring:
@@ -162,7 +162,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 				}
 			} else {
 				state = top
-				tokens = append(tokens, &Token{Type: String, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: String, Value: sb.String(), Line: line})
 				sb.Reset()
 				prevBackslash = false
 			}
@@ -170,20 +170,20 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]*Token, error) {
 	}
 	switch state {
 	case ident:
-		tokens = append(tokens, &Token{Type: Ident, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Line: line})
 	case number:
-		tokens = append(tokens, &Token{Type: Number, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: Number, Value: sb.String(), Line: line})
 	case qstring:
-		tokens = append(tokens, &Token{Type: String, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: String, Value: sb.String(), Line: line})
 	}
-	tokens = append(tokens, &Token{Type: EOF, Line: line})
+	tokens = append(tokens, Token{Type: EOF, Line: line})
 	tokens = coalesce(tokens, cfg.Ligatures)
 	return tokens, nil
 }
 
-func coalesce(tokens []*Token, ligatures []string) []*Token {
+func coalesce(tokens []Token, ligatures []string) []Token {
 	var (
-		newTokens  = make([]*Token, 0, len(tokens))
+		newTokens  = make([]Token, 0, len(tokens))
 		prevSymbol rune
 	)
 tokens:
@@ -194,7 +194,7 @@ tokens:
 				pair := string([]rune{prevSymbol, currentSymbol})
 				for _, l := range ligatures {
 					if pair == l {
-						newTokens[len(newTokens)-1] = &Token{Type: Symbol, Value: pair, Line: t.Line}
+						newTokens[len(newTokens)-1] = Token{Type: Symbol, Value: pair, Line: t.Line}
 						prevSymbol = 0
 						continue tokens
 					}
