@@ -21,7 +21,8 @@ const (
 	Ident
 	Symbol
 	String
-	Number
+	Int
+	Float
 )
 
 func (t TokenType) String() string {
@@ -34,8 +35,10 @@ func (t TokenType) String() string {
 		return "SYM"
 	case String:
 		return "STR"
-	case Number:
-		return "NUM"
+	case Int:
+		return "INT"
+	case Float:
+		return "FLT"
 	}
 	panic("unknown token type")
 }
@@ -65,6 +68,7 @@ const (
 	ident
 	qstring
 	number
+	float
 	comment
 )
 
@@ -131,12 +135,24 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				sb.Reset()
 			}
 		case number:
+			if c == '.' {
+				sb.WriteRune(c)
+				state = float
+			} else if unicode.IsDigit(c) {
+				sb.WriteRune(c)
+			} else {
+				state = top
+				r.UnreadRune()
+				tokens = append(tokens, Token{Type: Int, Value: sb.String(), Line: line})
+				sb.Reset()
+			}
+		case float:
 			if unicode.IsDigit(c) {
 				sb.WriteRune(c)
 			} else {
 				state = top
 				r.UnreadRune()
-				tokens = append(tokens, Token{Type: Number, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: Float, Value: sb.String(), Line: line})
 				sb.Reset()
 			}
 		case qstring:
@@ -172,7 +188,9 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 	case ident:
 		tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Line: line})
 	case number:
-		tokens = append(tokens, Token{Type: Number, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: Int, Value: sb.String(), Line: line})
+	case float:
+		tokens = append(tokens, Token{Type: Float, Value: sb.String(), Line: line})
 	case qstring:
 		tokens = append(tokens, Token{Type: String, Value: sb.String(), Line: line})
 	}

@@ -47,12 +47,18 @@ func parseElem(tokens []tokeniser.Token) (interface{}, []tokeniser.Token, error)
 	switch t.Type {
 	case tokeniser.Ident:
 		return t.Value, tokens[1:], nil
-	case tokeniser.Number:
+	case tokeniser.Int:
 		n, err := strconv.Atoi(t.Value)
 		if err != nil {
 			return nil, nil, err
 		}
 		return n, tokens[1:], nil
+	case tokeniser.Float:
+		x, err := strconv.ParseFloat(t.Value, 64)
+		if err != nil {
+			return nil, nil, err
+		}
+		return x, tokens[1:], nil
 	case tokeniser.String:
 		return String(t.Value), tokens[1:], nil
 	default:
