@@ -1,11 +1,12 @@
 package mapreduce
 
+// Engine is a wrapper for map-reduce algorithms.
 type Engine[T, V1, V2 any, K1, K2 comparable] struct {
 	f1 func(T, func(K1, V1))
 	f2 func(K1, []V1) (K2, V2)
 }
 
-// Engine is a wrapper for map-reduce algorithms.
+// Run runs the algorithm.
 func (e *Engine[T, V1, V2, K1, K2]) Run(input []T) map[K2]V2 {
 	pairs := make(map[K1][]V1)
 	for _, x := range input {
