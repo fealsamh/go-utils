@@ -31,15 +31,3 @@ func New[T, V1, V2 any, K1, K2 comparable](f1 func(T, func(K1, V1)), f2 func(K1,
 		f2: f2,
 	}
 }
-
-// type pair[T, U any] struct {
-// 	fst T
-// 	snd U
-// }
-
-// func newPair[T, U any](fst T, snd U) pair[T, U] {
-// 	return pair[T, U]{
-// 		fst: fst,
-// 		snd: snd,
-// 	}
-// }
