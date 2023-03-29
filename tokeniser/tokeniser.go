@@ -130,7 +130,9 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				sb.WriteRune(c)
 			} else {
 				state = top
-				r.UnreadRune()
+				if err := r.UnreadRune(); err != nil {
+					return nil, err
+				}
 				tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Line: line})
 				sb.Reset()
 			}
@@ -142,7 +144,9 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				sb.WriteRune(c)
 			} else {
 				state = top
-				r.UnreadRune()
+				if err := r.UnreadRune(); err != nil {
+					return nil, err
+				}
 				tokens = append(tokens, Token{Type: Int, Value: sb.String(), Line: line})
 				sb.Reset()
 			}
@@ -151,7 +155,9 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				sb.WriteRune(c)
 			} else {
 				state = top
-				r.UnreadRune()
+				if err := r.UnreadRune(); err != nil {
+					return nil, err
+				}
 				tokens = append(tokens, Token{Type: Float, Value: sb.String(), Line: line})
 				sb.Reset()
 			}
