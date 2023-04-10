@@ -14,13 +14,33 @@ func TestDeepEqual(t *testing.T) {
 		equal bool
 	}{
 		{
-			x:     1,
-			y:     1,
+			x:     int(1),
+			y:     int(1),
 			equal: true,
 		},
 		{
-			x:     1,
-			y:     2,
+			x:     float64(1.2),
+			y:     float64(1.2),
+			equal: true,
+		},
+		{
+			x:     float32(1.2),
+			y:     float32(1.2),
+			equal: true,
+		},
+		{
+			x:     "abcd",
+			y:     "abcd",
+			equal: true,
+		},
+		{
+			x:     int(1),
+			y:     int(2),
+			equal: false,
+		},
+		{
+			x:     int(1),
+			y:     float32(1),
 			equal: false,
 		},
 		{

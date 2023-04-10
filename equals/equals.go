@@ -14,6 +14,10 @@ func Deeply(x, y any) bool {
 		if v1.Interface().(int) != v2.Interface().(int) {
 			return false
 		}
+	case reflect.Float32:
+		if v1.Interface().(float32) != v2.Interface().(float32) {
+			return false
+		}
 	case reflect.Float64:
 		if v1.Interface().(float64) != v2.Interface().(float64) {
 			return false
@@ -38,6 +42,8 @@ func Deeply(x, y any) bool {
 		if !deepEqualStruct(v1.Interface(), v2.Interface()) {
 			return false
 		}
+	default:
+		panic("unhandled type " + t1.Name())
 	}
 	return true
 }
