@@ -5,8 +5,8 @@ type Semaphore struct {
 	ch chan struct{}
 }
 
-// NewSemaphore creates a new semaphore with an initial value.
-func NewSemaphore(val int) *Semaphore {
+// New creates a new semaphore with an initial value.
+func New(val int) *Semaphore {
 	return &Semaphore{
 		ch: make(chan struct{}, val),
 	}
