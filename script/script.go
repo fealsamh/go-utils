@@ -75,11 +75,7 @@ func (e *UUIDExpr) Eval(ctx *EvalContext) (any, error) {
 	if !ok {
 		return nil, fmt.Errorf("argument of 'uuid' must be a string")
 	}
-	u, err := uuid.Parse(s)
-	if err != nil {
-		return nil, err
-	}
-	return u, nil
+	return uuid.Parse(s)
 }
 
 // NewExpr is a `new` expression.
