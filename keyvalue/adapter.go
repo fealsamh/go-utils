@@ -13,6 +13,7 @@ type Adapter interface {
 	Pairs(func(string, interface{}))
 }
 
+// Copy copies the contents of `src` to `dst`.
 func Copy(dst, src Adapter) bool {
 	var failed bool
 	src.Pairs(func(key string, value interface{}) {

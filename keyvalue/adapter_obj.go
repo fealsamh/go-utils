@@ -1,6 +1,9 @@
 package keyvalue
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 // ObjectAdapter is a key-value adapter for instances of structures.
 type ObjectAdapter[T any] struct {
@@ -9,11 +12,15 @@ type ObjectAdapter[T any] struct {
 }
 
 // NewObjectAdapter creates a new object adapter.
-func NewObjectAdapter[T any](obj T) *ObjectAdapter[T] {
+func NewObjectAdapter[T any](obj T) (*ObjectAdapter[T], error) {
+	val := reflect.ValueOf(obj)
+	if val.Kind() == reflect.Pointer && val.IsZero() {
+		return nil, fmt.Errorf("failed to create object adapter for nil pointer (%s)", val.Type())
+	}
 	return &ObjectAdapter[T]{
 		obj: obj,
-		val: reflect.Indirect(reflect.ValueOf(obj)),
-	}
+		val: reflect.Indirect(val),
+	}, nil
 }
 
 // Get returns the value associated with the provided key.
