@@ -41,16 +41,19 @@ func (a *ObjectAdapter[T]) Put(key string, value interface{}) bool {
 }
 
 // Pairs enumerates all the key-value pairs of the underlying instance.
-func (a *ObjectAdapter[T]) Pairs(fn func(string, interface{})) {
+func (a *ObjectAdapter[T]) Pairs(fn func(string, interface{}) bool) bool {
 	t := a.val.Type()
 	n := t.NumField()
 	for i := 0; i < n; i++ {
 		f := t.Field(i)
 		if f.IsExported() {
 			v := a.val.Field(i)
-			fn(f.Name, v.Interface())
+			if !fn(f.Name, v.Interface()) {
+				return false
+			}
 		}
 	}
+	return true
 }
 
 var _ Adapter = new(ObjectAdapter[struct{}])
