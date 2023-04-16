@@ -60,7 +60,7 @@ func (v *VariableExpr) Eval(ctx *EvalContext) (any, error) {
 	return ctx.Get(v.name)
 }
 
-// UUIDxpr is a `uuid` expression.
+// UUIDExpr is a `uuid` expression.
 type UUIDExpr struct {
 	arg Expr
 }
@@ -100,8 +100,8 @@ func (e *NewExpr) Eval(ctx *EvalContext) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !a.Put(name, arg) {
-			return nil, fmt.Errorf("field '%s' not found in type '%s'", name, e.typ.Name())
+		if err := a.Put(name, arg); err != nil {
+			return nil, err
 		}
 	}
 	return r, nil
@@ -144,8 +144,8 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !a2.Put(name, arg) {
-			return nil, fmt.Errorf("field '%s' not found in type '%s'", name, typ.Name())
+		if err := a2.Put(name, arg); err != nil {
+			return nil, err
 		}
 	}
 	return r, nil
