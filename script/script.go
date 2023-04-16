@@ -6,6 +6,7 @@ import (
 
 	"github.com/fealsamh/go-utils/keyvalue"
 	"github.com/fealsamh/go-utils/sexpr"
+	"github.com/google/uuid"
 )
 
 // EvalContext is a node of a context in-tree.
@@ -57,6 +58,28 @@ type VariableExpr struct {
 // Eval evaluates an expression.
 func (v *VariableExpr) Eval(ctx *EvalContext) (any, error) {
 	return ctx.Get(v.name)
+}
+
+// UUIDxpr is a `uuid` expression.
+type UUIDExpr struct {
+	arg Expr
+}
+
+// Eval evaluates an expression.
+func (e *UUIDExpr) Eval(ctx *EvalContext) (any, error) {
+	arg, err := e.arg.Eval(ctx)
+	if err != nil {
+		return nil, err
+	}
+	s, ok := arg.(string)
+	if !ok {
+		return nil, fmt.Errorf("argument of 'uuid' must be a string")
+	}
+	u, err := uuid.Parse(s)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 // NewExpr is a `new` expression.
@@ -147,6 +170,15 @@ func Translate(in any, types map[string]reflect.Type) (Expr, error) {
 			return nil, fmt.Errorf("function name must be string, found '%v'", in[0])
 		}
 		switch fn {
+		case "uuid":
+			if len(in) != 2 {
+				return nil, fmt.Errorf("expected one argument in function call '%s'", fn)
+			}
+			arg, err := Translate(in[1], types)
+			if err != nil {
+				return nil, err
+			}
+			return &UUIDExpr{arg: arg}, nil
 		case "new":
 			if len(in) < 2 {
 				return nil, fmt.Errorf("too few arguments in function call '%s'", fn)
