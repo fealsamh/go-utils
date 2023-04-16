@@ -6,12 +6,6 @@ import (
 
 	"github.com/fealsamh/go-utils/keyvalue"
 	"github.com/fealsamh/go-utils/sexpr"
-	"github.com/google/uuid"
-)
-
-var (
-	uuidType   = reflect.TypeOf(uuid.Nil)
-	stringType = reflect.TypeOf("")
 )
 
 // EvalContext is a node of a context in-tree.
