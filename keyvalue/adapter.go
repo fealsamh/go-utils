@@ -9,6 +9,16 @@ type Pair[K, V any] struct {
 // Adapter is a key-value adapter.
 type Adapter interface {
 	Get(string) (interface{}, bool)
-	Put(string, interface{})
+	Put(string, interface{}) bool
 	Pairs(func(string, interface{}))
+}
+
+func Copy(dst, src Adapter) bool {
+	var failed bool
+	src.Pairs(func(key string, value interface{}) {
+		if !dst.Put(key, value) {
+			failed = true
+		}
+	})
+	return !failed
 }
