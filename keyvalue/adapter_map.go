@@ -26,10 +26,13 @@ func (a *MapAdapter) Put(key string, value interface{}) bool {
 }
 
 // Pairs enumerates all the key-value pairs of the underlying map.
-func (a *MapAdapter) Pairs(f func(string, interface{})) {
+func (a *MapAdapter) Pairs(f func(string, interface{}) bool) bool {
 	for k, v := range a.m {
-		f(k, v)
+		if !f(k, v) {
+			return false
+		}
 	}
+	return true
 }
 
 var _ Adapter = new(MapAdapter)

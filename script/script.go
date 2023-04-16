@@ -110,10 +110,11 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	a1.Pairs(func(key string, value interface{}) {
+	a1.Pairs(func(key string, value interface{}) bool {
 		if _, ok := e.properties[key]; !ok {
 			a2.Put(key, value)
 		}
+		return true
 	})
 	for name, expr := range e.properties {
 		arg, err := expr.Eval(ctx)
