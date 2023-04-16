@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/fealsamh/go-utils/keyvalue"
 	"github.com/fealsamh/go-utils/sexpr"
 	"github.com/google/uuid"
 )
@@ -72,21 +73,21 @@ type NewExpr struct {
 
 // Eval evaluates an expression.
 func (e *NewExpr) Eval(ctx *EvalContext) (any, error) {
-	v := reflect.New(e.typ).Elem()
+	r := reflect.New(e.typ).Interface()
+	a, err := keyvalue.NewObjectAdapter(r)
+	if err != nil {
+		return nil, err
+	}
 	for name, expr := range e.properties {
 		arg, err := expr.Eval(ctx)
 		if err != nil {
 			return nil, err
 		}
-		field := v.FieldByName(name)
-		if !field.IsValid() {
+		if !a.Put(name, arg) {
 			return nil, fmt.Errorf("field '%s' not found in type '%s'", name, e.typ.Name())
 		}
-		if err := setValue(field, reflect.ValueOf(arg)); err != nil {
-			return nil, err
-		}
 	}
-	return v.Addr().Interface(), nil
+	return r, nil
 }
 
 // WithExpr is a `with` expression.
@@ -105,47 +106,31 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 	if v1.Kind() != reflect.Pointer || v1.Elem().Kind() != reflect.Struct {
 		return nil, fmt.Errorf("first argument of 'with' must be an object, found '%v'", src)
 	}
-	v1 = v1.Elem()
-	typ := v1.Type()
-	v2 := reflect.New(typ).Elem()
-	for i := 0; i < typ.NumField(); i++ {
-		if _, ok := e.properties[typ.Field(i).Name]; !ok {
-			if err := setValue(v2.Field(i), v1.Field(i)); err != nil {
-				return nil, err
-			}
-		}
+	typ := v1.Type().Elem()
+	a1, err := keyvalue.NewObjectAdapter(src)
+	if err != nil {
+		return nil, err
 	}
+	r := reflect.New(typ).Interface()
+	a2, err := keyvalue.NewObjectAdapter(r)
+	if err != nil {
+		return nil, err
+	}
+	a1.Pairs(func(key string, value interface{}) {
+		if _, ok := e.properties[key]; !ok {
+			a2.Put(key, value)
+		}
+	})
 	for name, expr := range e.properties {
 		arg, err := expr.Eval(ctx)
 		if err != nil {
 			return nil, err
 		}
-		field := v2.FieldByName(name)
-		if !field.IsValid() {
+		if !a2.Put(name, arg) {
 			return nil, fmt.Errorf("field '%s' not found in type '%s'", name, typ.Name())
 		}
-		if err := setValue(field, reflect.ValueOf(arg)); err != nil {
-			return nil, err
-		}
 	}
-	return v2.Addr().Interface(), nil
-}
-
-func setValue(dst, src reflect.Value) error {
-	dstType, srcType := dst.Type(), src.Type()
-	switch {
-	case dstType == uuidType && srcType == stringType:
-		u, err := uuid.Parse(src.Interface().(string))
-		if err != nil {
-			return err
-		}
-		dst.Set(reflect.ValueOf(u))
-	case srcType.ConvertibleTo(dstType):
-		dst.Set(src.Convert(dstType))
-	default:
-		return fmt.Errorf("failed to set field '%s' -> '%s'", src.Type(), dst.Type())
-	}
-	return nil
+	return r, nil
 }
 
 // Translate translates an s-expression into an evaluatable AST.
