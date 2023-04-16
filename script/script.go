@@ -131,7 +131,9 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 	}
 	a1.Pairs(func(key string, value interface{}) bool {
 		if _, ok := e.properties[key]; !ok {
-			a2.Put(key, value)
+			if err := a2.Put(key, value); err != nil {
+				panic(err) // this should never happen
+			}
 		}
 		return true
 	})
