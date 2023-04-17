@@ -6,6 +6,7 @@ import (
 
 	"github.com/fealsamh/go-utils/keyvalue"
 	"github.com/fealsamh/go-utils/sexpr"
+	"github.com/google/uuid"
 )
 
 // EvalContext is a node of a context in-tree.
@@ -59,6 +60,24 @@ func (v *VariableExpr) Eval(ctx *EvalContext) (any, error) {
 	return ctx.Get(v.name)
 }
 
+// UUIDExpr is a `uuid` expression.
+type UUIDExpr struct {
+	arg Expr
+}
+
+// Eval evaluates an expression.
+func (e *UUIDExpr) Eval(ctx *EvalContext) (any, error) {
+	arg, err := e.arg.Eval(ctx)
+	if err != nil {
+		return nil, err
+	}
+	s, ok := arg.(string)
+	if !ok {
+		return nil, fmt.Errorf("argument of 'uuid' must be a string")
+	}
+	return uuid.Parse(s)
+}
+
 // NewExpr is a `new` expression.
 type NewExpr struct {
 	typ        reflect.Type
@@ -77,8 +96,8 @@ func (e *NewExpr) Eval(ctx *EvalContext) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !a.Put(name, arg) {
-			return nil, fmt.Errorf("field '%s' not found in type '%s'", name, e.typ.Name())
+		if err := a.Put(name, arg); err != nil {
+			return nil, err
 		}
 	}
 	return r, nil
@@ -112,7 +131,9 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 	}
 	a1.Pairs(func(key string, value interface{}) bool {
 		if _, ok := e.properties[key]; !ok {
-			a2.Put(key, value)
+			if err := a2.Put(key, value); err != nil {
+				panic(err) // this should never happen
+			}
 		}
 		return true
 	})
@@ -121,8 +142,8 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !a2.Put(name, arg) {
-			return nil, fmt.Errorf("field '%s' not found in type '%s'", name, typ.Name())
+		if err := a2.Put(name, arg); err != nil {
+			return nil, err
 		}
 	}
 	return r, nil
@@ -148,6 +169,15 @@ func Translate(in any, types map[string]reflect.Type) (Expr, error) {
 			return nil, fmt.Errorf("function name must be string, found '%v'", in[0])
 		}
 		switch fn {
+		case "uuid":
+			if len(in) != 2 {
+				return nil, fmt.Errorf("expected one argument in function call '%s'", fn)
+			}
+			arg, err := Translate(in[1], types)
+			if err != nil {
+				return nil, err
+			}
+			return &UUIDExpr{arg: arg}, nil
 		case "new":
 			if len(in) < 2 {
 				return nil, fmt.Errorf("too few arguments in function call '%s'", fn)

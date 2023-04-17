@@ -20,9 +20,9 @@ func (a *MapAdapter) Get(key string) (interface{}, bool) {
 }
 
 // Put sets a value for the provided key.
-func (a *MapAdapter) Put(key string, value interface{}) bool {
+func (a *MapAdapter) Put(key string, value interface{}) error {
 	a.m[key] = value
-	return true
+	return nil
 }
 
 // Pairs enumerates all the key-value pairs of the underlying map.

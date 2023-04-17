@@ -32,12 +32,16 @@ func (a *ObjectAdapter[T]) Get(key string) (interface{}, bool) {
 }
 
 // Put sets a value for the provided key.
-func (a *ObjectAdapter[T]) Put(key string, value interface{}) bool {
+func (a *ObjectAdapter[T]) Put(key string, value interface{}) error {
 	if v := a.val.FieldByName(key); v.IsValid() {
-		v.Set(reflect.ValueOf(value))
-		return true
+		vs := reflect.ValueOf(value)
+		if !vs.Type().ConvertibleTo(v.Type()) {
+			return fmt.Errorf("'put' for key '%s' failed, cannot convert '%s' into '%s'", key, vs.Type().Name(), v.Type().Name())
+		}
+		v.Set(vs.Convert(v.Type()))
+		return nil
 	}
-	return false
+	return fmt.Errorf("'put' for key '%s' failed, no such key in type", key)
 }
 
 // Pairs enumerates all the key-value pairs of the underlying instance.
