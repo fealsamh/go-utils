@@ -1,5 +1,7 @@
 package keyvalue
 
+import "reflect"
+
 // MapAdapter is a key-value adapter for in-built hash maps keyed off of strings.
 type MapAdapter struct {
 	m map[string]interface{}
@@ -7,9 +9,6 @@ type MapAdapter struct {
 
 // NewMapAdapter creates a new map adapter.
 func NewMapAdapter(m map[string]interface{}) *MapAdapter {
-	if m == nil {
-		m = make(map[string]interface{})
-	}
 	return &MapAdapter{m: m}
 }
 
@@ -35,4 +34,29 @@ func (a *MapAdapter) Pairs(f func(string, interface{}) bool) bool {
 	return true
 }
 
-var _ Adapter = new(MapAdapter)
+// ShouldConvert returns true if the provided type should be converted in the course of copying.
+func (a *MapAdapter) ShouldConvert(t reflect.Type) bool {
+	return t == stringAnyMapType
+}
+
+// NewInstance creates a new instance of the provided type and an associated adapter.
+func (a *MapAdapter) NewInstance(reflect.Type) (interface{}, Adapter, error) {
+	m := make(map[string]interface{})
+	return m, NewMapAdapter(m), nil
+}
+
+// NewAdapter creates a new key-value adapter for the provided value.
+func (a *MapAdapter) NewAdapter(v interface{}) (Adapter, error) {
+	return NewMapAdapter(v.(map[string]interface{})), nil
+}
+
+// TypeForKey returns the type of values associated with the key.
+func (a *MapAdapter) TypeForKey(key string) reflect.Type {
+	return stringAnyMapType
+}
+
+var (
+	stringAnyMapType = reflect.TypeOf((map[string]interface{})(nil))
+
+	_ Adapter = new(MapAdapter)
+)
