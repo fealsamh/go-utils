@@ -8,8 +8,9 @@ import (
 )
 
 type s1 struct {
-	N int
-	S *s2
+	N  int
+	S  *s2
+	Sl []*s2
 }
 
 type s2 struct {
@@ -21,6 +22,10 @@ func TestDeepCopy_ObjToMap(t *testing.T) {
 		N: 1234,
 		S: &s2{
 			T: "abcd",
+		},
+		Sl: []*s2{
+			{T: "A"},
+			{T: "B"},
 		},
 	})
 	if err != nil {
@@ -35,6 +40,10 @@ func TestDeepCopy_ObjToMap(t *testing.T) {
 		"N": 1234,
 		"S": map[string]interface{}{
 			"T": "abcd",
+		},
+		"Sl": []interface{}{
+			map[string]interface{}{"T": "A"},
+			map[string]interface{}{"T": "B"},
 		},
 	}
 	if !reflect.DeepEqual(m, dm) {
@@ -74,6 +83,10 @@ func TestDeepCopy_ObjToRBTree(t *testing.T) {
 		S: &s2{
 			T: "abcd",
 		},
+		Sl: []*s2{
+			{T: "A"},
+			{T: "B"},
+		},
 	})
 	if err != nil {
 		t.Fatalf("expected nil error, got '%s'", err)
@@ -88,6 +101,10 @@ func TestDeepCopy_ObjToRBTree(t *testing.T) {
 		"S": redblack.NewTreeFromMap(map[String]interface{}{
 			"T": "abcd",
 		}),
+		"Sl": []interface{}{
+			redblack.NewTreeFromMap(map[String]interface{}{"T": "A"}),
+			redblack.NewTreeFromMap(map[String]interface{}{"T": "B"}),
+		},
 	})
 	if !reflect.DeepEqual(tr, dt) {
 		t.Fatalf("expected '%v', got '%v'", tr, dt)
