@@ -3,6 +3,7 @@ module github.com/fealsamh/go-utils
 go 1.18
 
 require (
+	github.com/fealsamh/datastructures v0.1.8
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
