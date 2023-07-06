@@ -81,11 +81,23 @@ func (a *ObjectAdapter) NewAdapter(v interface{}) (Adapter, error) {
 	return NewObjectAdapter(v)
 }
 
-// TypeForKey returns the type of values associated with the key.
-func (a *ObjectAdapter) TypeForKey(key string) reflect.Type {
+// TypeForCompoundKey returns the type of values associated with the key.
+func (a *ObjectAdapter) TypeForCompoundKey(key string) reflect.Type {
 	f, ok := a.val.Type().FieldByName(key)
 	if !ok {
 		panic(fmt.Sprintf("unknown key '%s' in type '%s'", key, a.val.Type()))
+	}
+	return f.Type
+}
+
+// TypeForSliceKey returns the type of values associated with the key which is a slice.
+func (a *ObjectAdapter) TypeForSliceKey(key string) reflect.Type {
+	f, ok := a.val.Type().FieldByName(key)
+	if !ok {
+		panic(fmt.Sprintf("unknown key '%s' in type '%s'", key, a.val.Type()))
+	}
+	if f.Type.Kind() != reflect.Slice {
+		return nil
 	}
 	return f.Type
 }

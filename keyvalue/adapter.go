@@ -12,7 +12,8 @@ type Adapter interface {
 	ShouldConvert(reflect.Type) bool
 	NewInstance(reflect.Type) (interface{}, Adapter, error)
 	NewAdapter(interface{}) (Adapter, error)
-	TypeForKey(string) reflect.Type
+	TypeForCompoundKey(string) reflect.Type
+	TypeForSliceKey(string) reflect.Type
 }
 
 // Copy copies the contents of `src` to `dst`.
@@ -29,25 +30,47 @@ func Copy(dst, src Adapter) error {
 func DeepCopy(dst, src Adapter) error {
 	var err error
 	src.Pairs(func(key string, value interface{}) bool {
-		st := reflect.TypeOf(value)
-		if src.ShouldConvert(st) {
-			var (
-				v  interface{}
-				sa Adapter
-				da Adapter
-			)
-			if sa, err = src.NewAdapter(value); err == nil {
-				dt := dst.TypeForKey(key)
-				if v, da, err = dst.NewInstance(dt); err == nil {
-					if err = DeepCopy(da, sa); err == nil {
-						err = dst.Put(key, v)
-					}
-				}
-			}
-		} else {
-			err = dst.Put(key, value)
+		var v interface{}
+		v, err = deepCopyValue(value, dst.TypeForCompoundKey(key), dst.TypeForSliceKey(key), src, dst)
+		if err == nil {
+			err = dst.Put(key, v)
 		}
 		return err == nil
 	})
 	return err
+}
+
+func deepCopyValue(value interface{}, ty, tys reflect.Type, src, dst Adapter) (interface{}, error) {
+	st := reflect.TypeOf(value)
+	if st.Kind() == reflect.Slice {
+		sv := reflect.ValueOf(value)
+		if sv.IsZero() {
+			return nil, nil
+		}
+		ds := reflect.MakeSlice(tys, 0, sv.Len())
+		for i := 0; i < sv.Len(); i++ {
+			el, err := deepCopyValue(sv.Index(i).Interface(), ty, nil, src, dst)
+			if err != nil {
+				return nil, err
+			}
+			ds = reflect.Append(ds, reflect.ValueOf(el))
+		}
+		return ds.Interface(), nil
+	}
+	if src.ShouldConvert(st) {
+		sa, err := src.NewAdapter(value)
+		if err != nil {
+			return nil, err
+		}
+		dt := ty
+		v, da, err := dst.NewInstance(dt)
+		if err != nil {
+			return nil, err
+		}
+		if err := DeepCopy(da, sa); err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+	return value, nil
 }

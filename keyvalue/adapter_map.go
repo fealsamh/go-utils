@@ -50,13 +50,19 @@ func (a *MapAdapter) NewAdapter(v interface{}) (Adapter, error) {
 	return NewMapAdapter(v.(map[string]interface{})), nil
 }
 
-// TypeForKey returns the type of values associated with the key.
-func (a *MapAdapter) TypeForKey(key string) reflect.Type {
+// TypeForCompoundKey returns the type of values associated with the key.
+func (a *MapAdapter) TypeForCompoundKey(key string) reflect.Type {
 	return stringAnyMapType
 }
 
+// TypeForSliceKey returns the type of values associated with the key which is a slice.
+func (a *MapAdapter) TypeForSliceKey(key string) reflect.Type {
+	return emptyInterfaceSliceType
+}
+
 var (
-	stringAnyMapType = reflect.TypeOf((map[string]interface{})(nil))
+	stringAnyMapType        = reflect.TypeOf((map[string]interface{})(nil))
+	emptyInterfaceSliceType = reflect.TypeOf(([]interface{})(nil))
 
 	_ Adapter = new(MapAdapter)
 )

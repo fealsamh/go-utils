@@ -57,9 +57,14 @@ func (a *RBTreeAdapter) NewAdapter(v interface{}) (Adapter, error) {
 	return NewRBTreeAdapter(v.(*redblack.Tree[String, interface{}])), nil
 }
 
-// TypeForKey returns the type of values associated with the key.
-func (a *RBTreeAdapter) TypeForKey(key string) reflect.Type {
+// TypeForCompoundKey returns the type of values associated with the key.
+func (a *RBTreeAdapter) TypeForCompoundKey(key string) reflect.Type {
 	return stringAnyRBTreeType
+}
+
+// TypeForSliceKey returns the type of values associated with the key which is a slice.
+func (a *RBTreeAdapter) TypeForSliceKey(key string) reflect.Type {
+	return emptyInterfaceSliceType
 }
 
 var (
