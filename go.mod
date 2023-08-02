@@ -6,7 +6,7 @@ require (
 	github.com/fealsamh/datastructures v0.1.10
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 )
 
 require (
