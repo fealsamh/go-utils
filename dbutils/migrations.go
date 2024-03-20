@@ -21,7 +21,7 @@ type Migration struct {
 // RunMigrations runs the migrations.
 func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration) error {
 	if _, err := db.ExecContext(ctx, `
-	CREATE TABLE IF NOT EXISTS migrations (num INT NOT NULL, desc TEXT NOT NULL, hash BYTEA NOT NULL)`); err != nil {
+	CREATE TABLE IF NOT EXISTS migrations (num INT NOT NULL, "desc" TEXT NOT NULL, hash BYTEA NOT NULL)`); err != nil {
 		return err
 	}
 
