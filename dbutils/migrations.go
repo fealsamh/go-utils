@@ -25,7 +25,7 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration) error {
 		return err
 	}
 
-	rows, err := db.QueryContext(ctx, `SELECT num, desc, hash FROM migrations ORDER BY num`)
+	rows, err := db.QueryContext(ctx, `SELECT num, "desc", hash FROM migrations ORDER BY num`)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration) error {
 			return errors.Join(err, tx.Rollback())
 		}
 		if _, err := tx.ExecContext(ctx, `
-		INSERT INTO migrations (num, desc, hash) VALUES ($1, $2, $3)`, m.Number, m.Description, hash[:]); err != nil {
+		INSERT INTO migrations (num, "desc", hash) VALUES ($1, $2, $3)`, m.Number, m.Description, hash[:]); err != nil {
 			return errors.Join(err, tx.Rollback())
 		}
 		if err := tx.Commit(); err != nil {
