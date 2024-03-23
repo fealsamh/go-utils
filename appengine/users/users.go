@@ -25,8 +25,7 @@ func (u *User) ID() string { return u.id }
 // IsAdmin ...
 func (u *User) IsAdmin() bool { return u.isAdmin }
 
-// SetCurrentUser ...
-func SetCurrentUser(email, id string, isAdmin bool) {
+func setCurrentUser(email, id string, isAdmin bool) {
 	currentUser = &User{
 		email:   email,
 		id:      id,
@@ -34,8 +33,7 @@ func SetCurrentUser(email, id string, isAdmin bool) {
 	}
 }
 
-// ResetCurrentUser ...
-func ResetCurrentUser() {
+func resetCurrentUser() {
 	currentUser = nil
 }
 
