@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"net/http"
 
 	"google.golang.org/appengine/v2"
 	"google.golang.org/appengine/v2/user"
@@ -25,8 +26,7 @@ func (u *User) ID() string { return u.id }
 // IsAdmin ...
 func (u *User) IsAdmin() bool { return u.isAdmin }
 
-// SetCurrentUser ...
-func SetCurrentUser(email, id string, isAdmin bool) {
+func setCurrentUser(email, id string, isAdmin bool) {
 	currentUser = &User{
 		email:   email,
 		id:      id,
@@ -34,9 +34,23 @@ func SetCurrentUser(email, id string, isAdmin bool) {
 	}
 }
 
-// ResetCurrentUser ...
-func ResetCurrentUser() {
+func resetCurrentUser() {
 	currentUser = nil
+}
+
+// AddDevHandlers ...
+func AddDevHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("GET /_login_", func(w http.ResponseWriter, req *http.Request) {
+		d := req.URL.Query().Get("d")
+		setCurrentUser("abcd@email.dummy", "_local_id_", true)
+		http.Redirect(w, req, d, http.StatusSeeOther)
+	})
+
+	mux.HandleFunc("GET /_logout_", func(w http.ResponseWriter, req *http.Request) {
+		d := req.URL.Query().Get("d")
+		resetCurrentUser()
+		http.Redirect(w, req, d, http.StatusSeeOther)
+	})
 }
 
 // Current ...
