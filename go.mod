@@ -1,6 +1,6 @@
 module github.com/fealsamh/go-utils
 
-go 1.18
+go 1.20
 
 require (
 	github.com/fealsamh/datastructures v0.1.10
