@@ -21,20 +21,20 @@ func (h *LogHandler) Enabled(ctx context.Context, lev slog.Level) bool {
 
 // Handle ...
 func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
-	b := make([]byte, 0, 100)
-	b = append(b, "%s"...)
+	buf := make([]byte, 0, 100)
+	buf = append(buf, "%s"...)
 	args := make([]interface{}, 1, 1+2*(len(h.attrs)+rec.NumAttrs()))
 	args[0] = rec.Message
 	for _, a := range h.attrs {
-		b = append(b, " %s=%v"...)
+		buf = append(buf, " %s=%v"...)
 		args = append(args, h.group+a.Key, a.Value)
 	}
 	rec.Attrs(func(a slog.Attr) bool {
-		b = append(b, " %s=%v"...)
+		buf = append(buf, " %s=%v"...)
 		args = append(args, h.group+a.Key, a.Value)
 		return true
 	})
-	fmt := unsafe.String(unsafe.SliceData(b), len(b))
+	fmt := unsafe.String(unsafe.SliceData(buf), len(buf))
 	switch rec.Level {
 	case slog.LevelDebug:
 		gaelog.Debugf(ctx, fmt, args...)
