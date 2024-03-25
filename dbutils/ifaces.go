@@ -24,4 +24,7 @@ var (
 	_ Querier = (*sql.DB)(nil)
 	_ Execer  = (*sql.DB)(nil)
 	_ Txer    = (*sql.DB)(nil)
+
+	_ Querier = (*sql.Tx)(nil)
+	_ Execer  = (*sql.Tx)(nil)
 )
