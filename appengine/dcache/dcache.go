@@ -40,7 +40,13 @@ func Set(ctx context.Context, key string, value []byte) error {
 // Remove ...
 func Remove(ctx context.Context, key string) error {
 	if appengine.IsAppEngine() {
-		return memcache.Delete(ctx, key)
+		if err := memcache.Delete(ctx, key); err != nil {
+			if errors.Is(err, memcache.ErrCacheMiss) {
+				return ErrCacheMiss
+			}
+			return err
+		}
+		return nil
 	}
 	return cacheDb.Delete([]byte(key), nil)
 }
