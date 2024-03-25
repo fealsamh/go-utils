@@ -3,6 +3,7 @@ package loghandler
 import (
 	"context"
 	"log/slog"
+	"strings"
 
 	gaelog "google.golang.org/appengine/v2/log"
 )
@@ -20,17 +21,20 @@ func (h *LogHandler) Enabled(ctx context.Context, lev slog.Level) bool {
 
 // Handle ...
 func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
-	fmt := "%s"
-	args := []interface{}{rec.Message}
+	var sb strings.Builder
+	sb.WriteString("%s")
+	args := make([]interface{}, 1, 1+2*(len(h.attrs)+rec.NumAttrs()))
+	args[0] = rec.Message
 	for _, a := range h.attrs {
-		fmt += " %s=%v"
+		sb.WriteString(" %s=%v")
 		args = append(args, h.group+a.Key, a.Value)
 	}
 	rec.Attrs(func(a slog.Attr) bool {
-		fmt += " %s=%v"
+		sb.WriteString(" %s=%v")
 		args = append(args, h.group+a.Key, a.Value)
 		return true
 	})
+	fmt := sb.String()
 	switch rec.Level {
 	case slog.LevelDebug:
 		gaelog.Debugf(ctx, fmt, args...)
