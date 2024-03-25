@@ -37,6 +37,20 @@ func Set(ctx context.Context, key string, value []byte) error {
 	return cacheDb.Put([]byte(key), value, nil)
 }
 
+// Remove ...
+func Remove(ctx context.Context, key string) error {
+	if appengine.IsAppEngine() {
+		if err := memcache.Delete(ctx, key); err != nil {
+			if errors.Is(err, memcache.ErrCacheMiss) {
+				return ErrCacheMiss
+			}
+			return err
+		}
+		return nil
+	}
+	return cacheDb.Delete([]byte(key), nil)
+}
+
 // Get ...
 func Get(ctx context.Context, key string) ([]byte, error) {
 	if appengine.IsAppEngine() {
