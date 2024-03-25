@@ -5,6 +5,7 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"unsafe"
 
 	gaelog "google.golang.org/appengine/v2/log"
 )
@@ -26,21 +27,22 @@ func (h *LogHandler) Enabled(ctx context.Context, lev slog.Level) bool {
 
 // Handle ...
 func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
-	b := bs.Get().(*bytes.Buffer)
-	b.Reset()
-	b.WriteString("%s")
+	buf := bs.Get().(*bytes.Buffer)
+	buf.Reset()
+	buf.WriteString("%s")
 	args := make([]interface{}, 1, 1+2*(len(h.attrs)+rec.NumAttrs()))
 	args[0] = rec.Message
 	for _, a := range h.attrs {
-		b.WriteString(" %s=%v")
+		buf.WriteString(" %s=%v")
 		args = append(args, h.group+a.Key, a.Value)
 	}
 	rec.Attrs(func(a slog.Attr) bool {
-		b.WriteString(" %s=%v")
+		buf.WriteString(" %s=%v")
 		args = append(args, h.group+a.Key, a.Value)
 		return true
 	})
-	fmt := b.String()
+	b := buf.Bytes()
+	fmt := unsafe.String(unsafe.SliceData(b), len(b))
 	switch rec.Level {
 	case slog.LevelDebug:
 		gaelog.Debugf(ctx, fmt, args...)
@@ -51,7 +53,7 @@ func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
 	case slog.LevelError:
 		gaelog.Errorf(ctx, fmt, args...)
 	}
-	bs.Put(b)
+	bs.Put(buf)
 	return nil
 }
 
