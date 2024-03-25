@@ -1,12 +1,17 @@
 package loghandler
 
 import (
+	"bytes"
 	"context"
 	"log/slog"
-	"unsafe"
+	"sync"
 
 	gaelog "google.golang.org/appengine/v2/log"
 )
+
+var bs = sync.Pool{
+	New: func() interface{} { return new(bytes.Buffer) },
+}
 
 // LogHandler ...
 type LogHandler struct {
@@ -21,20 +26,21 @@ func (h *LogHandler) Enabled(ctx context.Context, lev slog.Level) bool {
 
 // Handle ...
 func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
-	b := make([]byte, 0, 100)
-	b = append(b, "%s"...)
+	b := bs.Get().(*bytes.Buffer)
+	b.Reset()
+	b.WriteString("%s")
 	args := make([]interface{}, 1, 1+2*(len(h.attrs)+rec.NumAttrs()))
 	args[0] = rec.Message
 	for _, a := range h.attrs {
-		b = append(b, " %s=%v"...)
+		b.WriteString(" %s=%v")
 		args = append(args, h.group+a.Key, a.Value)
 	}
 	rec.Attrs(func(a slog.Attr) bool {
-		b = append(b, " %s=%v"...)
+		b.WriteString(" %s=%v")
 		args = append(args, h.group+a.Key, a.Value)
 		return true
 	})
-	fmt := unsafe.String(unsafe.SliceData(b), len(b))
+	fmt := b.String()
 	switch rec.Level {
 	case slog.LevelDebug:
 		gaelog.Debugf(ctx, fmt, args...)
@@ -45,6 +51,7 @@ func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
 	case slog.LevelError:
 		gaelog.Errorf(ctx, fmt, args...)
 	}
+	bs.Put(b)
 	return nil
 }
 
