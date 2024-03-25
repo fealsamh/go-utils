@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/fealsamh/go-utils/keyvalue"
 	"github.com/fealsamh/go-utils/sexpr"
 	"github.com/google/uuid"
 )
@@ -87,18 +86,17 @@ type NewExpr struct {
 // Eval evaluates an expression.
 func (e *NewExpr) Eval(ctx *EvalContext) (any, error) {
 	r := reflect.New(e.typ).Interface()
-	a, err := keyvalue.NewObjectAdapter(r)
-	if err != nil {
-		return nil, err
-	}
+	v := reflect.ValueOf(r).Elem()
 	for name, expr := range e.properties {
 		arg, err := expr.Eval(ctx)
 		if err != nil {
 			return nil, err
 		}
-		if err := a.Put(name, arg); err != nil {
-			return nil, err
+		f := v.FieldByName(name)
+		if !f.IsValid() {
+			return nil, fmt.Errorf("unknown field '%s'", name)
 		}
+		f.Set(reflect.ValueOf(arg))
 	}
 	return r, nil
 }
@@ -120,31 +118,27 @@ func (e *WithExpr) Eval(ctx *EvalContext) (any, error) {
 		return nil, fmt.Errorf("first argument of 'with' must be an object, found '%v'", src)
 	}
 	typ := v1.Type().Elem()
-	a1, err := keyvalue.NewObjectAdapter(src)
-	if err != nil {
-		return nil, err
-	}
+	v1 = v1.Elem()
 	r := reflect.New(typ).Interface()
-	a2, err := keyvalue.NewObjectAdapter(r)
-	if err != nil {
-		return nil, err
-	}
-	a1.Pairs(func(key string, value interface{}) bool {
-		if _, ok := e.properties[key]; !ok {
-			if err := a2.Put(key, value); err != nil {
-				panic(err) // this should never happen
-			}
+	v2 := reflect.ValueOf(r).Elem()
+	for i := 0; i < v1.NumField(); i++ {
+		n := typ.Field(i).Name
+		f := v2.FieldByName(n)
+		if !f.IsValid() {
+			return nil, fmt.Errorf("unknown field '%s'", n)
 		}
-		return true
-	})
+		f.Set(v1.Field(i))
+	}
 	for name, expr := range e.properties {
 		arg, err := expr.Eval(ctx)
 		if err != nil {
 			return nil, err
 		}
-		if err := a2.Put(name, arg); err != nil {
-			return nil, err
+		f := v2.FieldByName(name)
+		if !f.IsValid() {
+			return nil, fmt.Errorf("unknown field '%s'", name)
 		}
+		f.Set(reflect.ValueOf(arg))
 	}
 	return r, nil
 }
