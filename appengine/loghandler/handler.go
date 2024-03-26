@@ -5,8 +5,8 @@ import (
 	"context"
 	"log/slog"
 	"sync"
-	"unsafe"
 
+	"github.com/fealsamh/go-utils/nocopy"
 	gaelog "google.golang.org/appengine/v2/log"
 )
 
@@ -41,8 +41,7 @@ func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
 		args = append(args, h.group+a.Key, a.Value)
 		return true
 	})
-	b := buf.Bytes()
-	fmt := unsafe.String(unsafe.SliceData(b), len(b))
+	fmt := nocopy.String(buf.Bytes())
 	switch rec.Level {
 	case slog.LevelDebug:
 		gaelog.Debugf(ctx, fmt, args...)
