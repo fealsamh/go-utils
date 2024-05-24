@@ -8,6 +8,7 @@ import (
 // Querier is an interface for database queries.
 type Querier interface {
 	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
 // Execer is an interface for database statements.
