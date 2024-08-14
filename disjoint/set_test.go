@@ -15,8 +15,8 @@ func (s1 String) Less(s2 String) bool {
 func TestUnion(t *testing.T) {
 	req := require.New(t)
 
-	x := New[String]("a")
-	y := New[String]("b")
+	x := NewEl[String]("a")
+	y := NewEl[String]("b")
 
 	req.Equal("a", string(x.Find().Value))
 	req.Equal("b", string(y.Find().Value))

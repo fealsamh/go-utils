@@ -1,26 +1,29 @@
 package disjoint
 
+// Ordered is an ordered type.
 type Ordered[T any] interface {
 	Less(T) bool
 }
 
-type Set[T any] struct {
+// SetEl is a disjoint set's elements.
+type SetEl[T any] struct {
 	Value  T
-	parent *Set[T]
+	parent *SetEl[T]
 }
 
-func New[T any](x T) *Set[T] {
-	return &Set[T]{Value: x}
+// NewEl creates a new element of a disjoint set.
+func NewEl[T any](x T) *SetEl[T] {
+	return &SetEl[T]{Value: x}
 }
 
-func (x *Set[T]) Find() *Set[T] {
+func (x *SetEl[T]) Find() *SetEl[T] {
 	if x.parent == nil {
 		return x
 	}
 	return x.parent.Find()
 }
 
-func (x *Set[T]) Union(y *Set[T]) {
+func (x *SetEl[T]) Union(y *SetEl[T]) {
 	v1 := x.Find()
 	v2 := y.Find()
 	if v, ok := any(v1.Value).(Ordered[T]); ok {
