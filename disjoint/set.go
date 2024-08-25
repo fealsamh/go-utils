@@ -5,7 +5,7 @@ type Ordered[T any] interface {
 	Less(T) bool
 }
 
-// SetEl is a disjoint set's elements.
+// SetEl is a disjoint set's element.
 type SetEl[T any] struct {
 	Value  T
 	parent *SetEl[T]
