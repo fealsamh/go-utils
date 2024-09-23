@@ -3,10 +3,10 @@ package testutils
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/fealsamh/go-utils/textutils"
-	"golang.org/x/exp/slices"
 )
 
 // Case is a specific text case.

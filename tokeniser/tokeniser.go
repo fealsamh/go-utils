@@ -5,11 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
-
-	"golang.org/x/exp/slices"
 )
 
 // TokenType is a token's type.
