@@ -1,6 +1,9 @@
 package testutils
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 // JSONField is a JSON-marshallable field.
 type JSONField struct {
@@ -14,7 +17,7 @@ func JSONFields(typ reflect.Type) []JSONField {
 	for _, field := range reflect.VisibleFields(typ) {
 		if tag := field.Tag.Get("json"); tag != "-" {
 			fields = append(fields, JSONField{
-				Name: field.Name,
+				Name: fmt.Sprintf("%s", field.Name),
 				Tag:  tag,
 			})
 		}
