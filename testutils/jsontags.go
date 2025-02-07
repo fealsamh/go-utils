@@ -1,7 +1,6 @@
 package testutils
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -16,8 +15,9 @@ func JSONFields(typ reflect.Type) []JSONField {
 	var fields []JSONField
 	for _, field := range reflect.VisibleFields(typ) {
 		if tag := field.Tag.Get("json"); tag != "-" {
+			b := []byte(field.Name)
 			fields = append(fields, JSONField{
-				Name: fmt.Sprintf("%s", field.Name),
+				Name: string(b),
 				Tag:  tag,
 			})
 		}
