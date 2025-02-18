@@ -1,6 +1,8 @@
 package errors
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"google.golang.org/grpc/codes"
@@ -55,6 +57,22 @@ func convertToGRPC(err error) error {
 		}
 	}
 	return nil
+}
+
+// WriteHTTPError writes the HTTP error.
+func WriteHTTPError(err error, w http.ResponseWriter) {
+	WriteHTTPHeader(err, w)
+	io.WriteString(w, err.Error())
+}
+
+type jsonError struct {
+	Error string `json:"error"`
+}
+
+// WriteHTTPErrorJSON writes the HTTP error as JSON.
+func WriteHTTPErrorJSON(err error, w http.ResponseWriter) {
+	WriteHTTPHeader(err, w)
+	json.NewEncoder(w).Encode(jsonError{err.Error()})
 }
 
 // WriteHTTPHeader writes the HTTP header.
