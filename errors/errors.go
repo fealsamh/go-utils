@@ -1,10 +1,13 @@
 package errors
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -19,9 +22,52 @@ func (e *Error) Error() string {
 	return e.message
 }
 
+// WrappedError is a wrapped error with an error code.
+type WrappedError struct {
+	err  error
+	code Code
+}
+
+func (e *WrappedError) Error() string {
+	return e.err.Error()
+}
+
+func (e *WrappedError) Unwrap() error {
+	return e.err
+}
+
 // New creates a new error.
 func New(message string, code Code) *Error {
 	return &Error{message, code}
+}
+
+// Wrap creates a wrapped error.
+func Wrap(err error, code Code) *WrappedError {
+	return &WrappedError{err, code}
+}
+
+// FromError creates an error with an error code from the provided error.
+func FromError(err error) (*WrappedError, bool) {
+	switch {
+	case errors.Is(err, errors.ErrUnsupported):
+		return &WrappedError{err, Unimplemented}, true
+
+	case errors.Is(err, sql.ErrNoRows):
+		return &WrappedError{err, NotFound}, true
+
+	case uuid.IsInvalidLengthError(err):
+		return &WrappedError{err, InvalidArgument}, true
+
+	case err.Error() == "invalid UUID format":
+		return &WrappedError{err, InvalidArgument}, true
+	}
+
+	var jsonErr *json.SyntaxError
+	if errors.As(err, &jsonErr) {
+		return &WrappedError{err, InvalidArgument}, true
+	}
+
+	return nil, false
 }
 
 // WriteHTTPHeader writes the HTTP header.
