@@ -18,6 +18,22 @@ const (
 	Internal
 )
 
+func (c Code) String() string {
+	switch c {
+	case NotFound:
+		return "not found"
+	case InvalidArgument:
+		return "invalid argument"
+	case Unauthorised:
+		return "unauthorised"
+	case Unimplemented:
+		return "unimplemented"
+	case Internal:
+		return "internal"
+	}
+	return ""
+}
+
 // HTTPStatus returns the code's HTTP status.
 func (c Code) HTTPStatus() int {
 	switch c {
