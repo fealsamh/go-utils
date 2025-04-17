@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/fealsamh/go-utils/nocopy"
 	"github.com/syndtr/goleveldb/leveldb"
 	"google.golang.org/appengine/v2"
 	"google.golang.org/appengine/v2/memcache"
@@ -34,7 +35,7 @@ func Set(ctx context.Context, key string, value []byte) error {
 			Value: value,
 		})
 	}
-	return cacheDb.Put([]byte(key), value, nil)
+	return cacheDb.Put(nocopy.Bytes(key), value, nil)
 }
 
 // Remove ...
@@ -48,7 +49,7 @@ func Remove(ctx context.Context, key string) error {
 		}
 		return nil
 	}
-	return cacheDb.Delete([]byte(key), nil)
+	return cacheDb.Delete(nocopy.Bytes(key), nil)
 }
 
 // Get ...
@@ -63,7 +64,7 @@ func Get(ctx context.Context, key string) ([]byte, error) {
 		}
 		return item.Value, nil
 	}
-	val, err := cacheDb.Get([]byte(key), nil)
+	val, err := cacheDb.Get(nocopy.Bytes(key), nil)
 	if err != nil {
 		if errors.Is(err, leveldb.ErrNotFound) {
 			return nil, ErrCacheMiss
