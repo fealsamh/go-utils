@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/goleveldb v1.0.0
 	golang.org/x/mobile v0.0.0-20250813145510-f12310a0cfd9
 	google.golang.org/appengine/v2 v2.0.6
