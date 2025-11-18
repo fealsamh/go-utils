@@ -9,7 +9,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0
 	golang.org/x/mobile v0.0.0-20251113184115-a159579294ab
 	google.golang.org/appengine/v2 v2.0.6
-	google.golang.org/grpc v1.76.0
+	google.golang.org/grpc v1.77.0
 )
 
 require (
