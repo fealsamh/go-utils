@@ -9,7 +9,7 @@ type Continuation[T any] struct {
 	err    error
 }
 
-// Resume resumes a continuation.
+// Resume resumes the continuation.
 func (c *Continuation[T]) Resume(result T, err error) {
 	c.result = result
 	c.err = err
