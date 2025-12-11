@@ -24,6 +24,10 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration) error {
 	CREATE TABLE IF NOT EXISTS migrations (num INT NOT NULL, "desc" TEXT NOT NULL, hash BYTEA NOT NULL)`); err != nil {
 		return err
 	}
+	if _, err := db.ExecContext(ctx, `
+	CREATE INDEX IF NOT EXISTS idx_migrations_num ON migrations (num)`); err != nil {
+		return err
+	}
 
 	rows, err := db.QueryContext(ctx, `SELECT num, "desc", hash FROM migrations ORDER BY num`)
 	if err != nil {
