@@ -45,7 +45,6 @@ func AddDevHandlers(mux *http.ServeMux) {
 		setCurrentUser("abcd@email.dummy", "_local_id_", true)
 		http.Redirect(w, req, d, http.StatusSeeOther)
 	})
-
 	mux.HandleFunc("GET /_logout_", func(w http.ResponseWriter, req *http.Request) {
 		d := req.URL.Query().Get("d")
 		resetCurrentUser()
