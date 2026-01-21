@@ -18,7 +18,7 @@ func Parse(tokens []tokeniser.Token) ([]interface{}, error) {
 func parseList(tokens []tokeniser.Token) ([]interface{}, []tokeniser.Token, error) {
 	t := tokens[0]
 	if !(t.Type == tokeniser.Symbol && t.Value == "(") {
-		return nil, nil, fmt.Errorf("expected '(' (line %d)", t.Line)
+		return nil, nil, fmt.Errorf("expected '(' (line %d)", t.Location.Line)
 	}
 	tokens = tokens[1:]
 	var list []interface{}
@@ -62,7 +62,7 @@ func parseElem(tokens []tokeniser.Token) (interface{}, []tokeniser.Token, error)
 	case tokeniser.String:
 		return String(t.Value), tokens[1:], nil
 	default:
-		return nil, nil, fmt.Errorf("expected identifier, number, string or '(' (line %d)", t.Line)
+		return nil, nil, fmt.Errorf("expected identifier, number, string or '(' (line %d)", t.Location.Line)
 	}
 }
 

@@ -42,21 +42,26 @@ func (t TokenType) String() string {
 	panic("unknown token type")
 }
 
+// Location is a tokens location.
+type Location struct {
+	Line int
+}
+
 // Token is a textual token.
 type Token struct {
-	Type  TokenType
-	Value string
-	Line  int
+	Type     TokenType
+	Value    string
+	Location *Location
 }
 
 func (t Token) String() string {
 	switch t.Type {
 	case String:
-		return fmt.Sprintf("%s:%s:%d", t.Type, strconv.Quote(t.Value), t.Line)
+		return fmt.Sprintf("%s:%s:%d", t.Type, strconv.Quote(t.Value), t.Location.Line)
 	case EOF:
-		return fmt.Sprintf("%s:%d", t.Type, t.Line)
+		return fmt.Sprintf("%s:%d", t.Type, t.Location.Line)
 	default:
-		return fmt.Sprintf("%s:%v:%d", t.Type, t.Value, t.Line)
+		return fmt.Sprintf("%s:%v:%d", t.Type, t.Value, t.Location.Line)
 	}
 }
 
@@ -117,7 +122,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 			case c == '"':
 				state = qstring
 			default:
-				tokens = append(tokens, Token{Type: Symbol, Value: string(c), Line: line})
+				tokens = append(tokens, Token{Type: Symbol, Value: string(c), Location: &Location{Line: line}})
 			}
 		case comment:
 			if c == '\n' {
@@ -132,7 +137,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				if err := r.UnreadRune(); err != nil {
 					return nil, err
 				}
-				tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Location: &Location{Line: line}})
 				sb.Reset()
 			}
 		case number:
@@ -146,7 +151,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				if err := r.UnreadRune(); err != nil {
 					return nil, err
 				}
-				tokens = append(tokens, Token{Type: Int, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: Int, Value: sb.String(), Location: &Location{Line: line}})
 				sb.Reset()
 			}
 		case float:
@@ -157,7 +162,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				if err := r.UnreadRune(); err != nil {
 					return nil, err
 				}
-				tokens = append(tokens, Token{Type: Float, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: Float, Value: sb.String(), Location: &Location{Line: line}})
 				sb.Reset()
 			}
 		case qstring:
@@ -183,7 +188,7 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 				}
 			} else {
 				state = top
-				tokens = append(tokens, Token{Type: String, Value: sb.String(), Line: line})
+				tokens = append(tokens, Token{Type: String, Value: sb.String(), Location: &Location{Line: line}})
 				sb.Reset()
 				prevBackslash = false
 			}
@@ -191,15 +196,15 @@ func Tokenise(r *bufio.Reader, cfg *Config) ([]Token, error) {
 	}
 	switch state {
 	case ident:
-		tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: Ident, Value: sb.String(), Location: &Location{Line: line}})
 	case number:
-		tokens = append(tokens, Token{Type: Int, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: Int, Value: sb.String(), Location: &Location{Line: line}})
 	case float:
-		tokens = append(tokens, Token{Type: Float, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: Float, Value: sb.String(), Location: &Location{Line: line}})
 	case qstring:
-		tokens = append(tokens, Token{Type: String, Value: sb.String(), Line: line})
+		tokens = append(tokens, Token{Type: String, Value: sb.String(), Location: &Location{Line: line}})
 	}
-	tokens = append(tokens, Token{Type: EOF, Line: line})
+	tokens = append(tokens, Token{Type: EOF, Location: &Location{Line: line}})
 	tokens = coalesce(tokens, cfg.Ligatures)
 	return tokens, nil
 }
@@ -217,7 +222,7 @@ tokens:
 				pair := string([]rune{prevSymbol, currentSymbol})
 				for _, l := range ligatures {
 					if pair == l {
-						newTokens[len(newTokens)-1] = Token{Type: Symbol, Value: pair, Line: t.Line}
+						newTokens[len(newTokens)-1] = Token{Type: Symbol, Value: pair, Location: t.Location}
 						prevSymbol = 0
 						continue tokens
 					}
