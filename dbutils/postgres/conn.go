@@ -1,4 +1,4 @@
-package dbutils
+package postgres
 
 import (
 	"database/sql"
@@ -6,8 +6,8 @@ import (
 	"github.com/lib/pq"
 )
 
-// OpenDB opens a database specified by the provided DSN and pings it.
-func OpenDB(dsn string) (*sql.DB, error) {
+// Open opens a PostgreSQL database specified by the provided DSN and pings it.
+func Open(dsn string) (*sql.DB, error) {
 	conn, err := pq.NewConnector(dsn)
 	if err != nil {
 		return nil, err
