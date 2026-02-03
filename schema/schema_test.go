@@ -1,9 +1,12 @@
 package schema
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/fealsamh/go-utils/nocopy"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,4 +20,19 @@ func TestValidation(t *testing.T) {
 
 	err := Validate[s](nocopy.Bytes(`{"name":"Jane", "age": 18}`))
 	req.Nil(err)
+}
+
+func TestSchema(t *testing.T) {
+	req := require.New(t)
+
+	type s struct {
+		Name string `json:"name"`
+		Age  *int   `json:"age,omitempty"`
+	}
+
+	sch, err := jsonschema.For[s](nil)
+	req.Nil(err)
+	b, err := json.Marshal(sch)
+	req.Nil(err)
+	fmt.Println(nocopy.String(b))
 }
