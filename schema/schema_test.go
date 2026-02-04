@@ -27,7 +27,7 @@ func TestSchema(t *testing.T) {
 
 	type s struct {
 		Name string `json:"name"`
-		Age  *int   `json:"age,omitempty"`
+		Age  int    `json:"age,omitempty"`
 	}
 
 	sch, err := jsonschema.For[s](nil)
