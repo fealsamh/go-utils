@@ -8,7 +8,7 @@ require (
 	github.com/modelcontextprotocol/go-sdk v1.3.0
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/goleveldb v1.0.0
-	golang.org/x/mobile v0.0.0-20260204172633-1dceadbbeea3
+	golang.org/x/mobile v0.0.0-20260209203831-923679eb55af
 	google.golang.org/appengine/v2 v2.0.6
 	google.golang.org/grpc v1.78.0
 )
@@ -22,7 +22,7 @@ require (
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	golang.org/x/oauth2 v0.35.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260203192932-546029d2fa20 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260209200024-4cfbd4190f57 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
