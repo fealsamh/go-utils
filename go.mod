@@ -1,6 +1,6 @@
 module github.com/fealsamh/go-utils
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/google/uuid v1.6.0
@@ -8,7 +8,7 @@ require (
 	github.com/modelcontextprotocol/go-sdk v1.3.0
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/goleveldb v1.0.0
-	golang.org/x/mobile v0.0.0-20260209203831-923679eb55af
+	golang.org/x/mobile v0.0.0-20260211191516-dcd2a3258864
 	google.golang.org/appengine/v2 v2.0.6
 	google.golang.org/grpc v1.78.0
 )
