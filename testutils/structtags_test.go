@@ -44,23 +44,23 @@ type StructXML2 struct {
 func TestCheckJSONTags(t *testing.T) {
 	assert := assert.New(t)
 
-	err := CheckJSONTags(reflect.TypeOf((*StructJSON1)(nil)), "id")
+	err := CheckJSONTags(reflect.TypeFor[*StructJSON1](), "id")
 	assert.Nil(err)
 
-	err = CheckJSONTags(reflect.TypeOf((*StructJSON2)(nil)), "id")
+	err = CheckJSONTags(reflect.TypeFor[*StructJSON2](), "id")
 	assert.NotNil(err)
 	assert.Equal(err.Error(), "bad 'json' struct tag for testutils.StructJSON2.SomeField (some_field != somefield)")
 
-	err = CheckStructTags("json", CamelCase, reflect.TypeOf((*StructJSON3)(nil)), "id")
+	err = CheckStructTags("json", CamelCase, reflect.TypeFor[*StructJSON3](), "id")
 	assert.Nil(err)
 }
 
 func TestCheckXMLTags(t *testing.T) {
 	assert := assert.New(t)
 
-	err := CheckXMLTags(reflect.TypeOf((*StructXML1)(nil)))
+	err := CheckXMLTags(reflect.TypeFor[*StructXML1]())
 	assert.Nil(err)
 
-	err = CheckXMLTags(reflect.TypeOf((*StructXML2)(nil)))
+	err = CheckXMLTags(reflect.TypeFor[*StructXML2]())
 	assert.Nil(err)
 }

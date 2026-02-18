@@ -11,7 +11,7 @@ import (
 )
 
 var bs = sync.Pool{
-	New: func() interface{} { return new(bytes.Buffer) },
+	New: func() any { return new(bytes.Buffer) },
 }
 
 // LogHandler ...
@@ -30,7 +30,7 @@ func (h *LogHandler) Handle(ctx context.Context, rec slog.Record) error {
 	buf := bs.Get().(*bytes.Buffer)
 	buf.Reset()
 	buf.WriteString("%s")
-	args := make([]interface{}, 1, 1+2*(len(h.attrs)+rec.NumAttrs()))
+	args := make([]any, 1, 1+2*(len(h.attrs)+rec.NumAttrs()))
 	args[0] = rec.Message
 	for _, a := range h.attrs {
 		buf.WriteString(" %s=%v")

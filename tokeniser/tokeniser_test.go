@@ -11,7 +11,7 @@ var gTokens []Token
 
 func BenchmarkTokeniser(b *testing.B) {
 	var sb strings.Builder
-	for i := 0; i < 1_000; i++ {
+	for i := range 1_000 {
 		sb.WriteString(fmt.Sprintf("id%d ", i))
 	}
 	code := sb.String()
