@@ -5,16 +5,16 @@ import (
 	"testing"
 )
 
-var gSexpr []interface{}
+var gSexpr []any
 
 func BenchmarkSExpr(b *testing.B) {
 	var code string
-	for i := 0; i < 1_000; i++ {
+	for range 1_000 {
 		code = fmt.Sprintf("(a1 (%s) a2)", code)
 	}
 	b.ResetTimer()
 	var (
-		sexpr []interface{}
+		sexpr []any
 		err   error
 	)
 	for n := 0; n < b.N; n++ {

@@ -21,7 +21,7 @@ const (
 
 // CheckStructTags checks whether field names match with struct tags.
 func CheckStructTags(tagAttr string, cas Case, typ reflect.Type, terms ...string) error {
-	for typ.Kind() == reflect.Ptr {
+	for typ.Kind() == reflect.Pointer {
 		typ = typ.Elem()
 	}
 	for i := 0; i < typ.NumField(); i++ {
@@ -62,24 +62,24 @@ func convertCase(cas Case, s string, terms ...string) string {
 		return textutils.SnakecasedFromCamelcased(s, terms...)
 	case CamelCase:
 		comps := textutils.SplitCamelcasedString(s, terms...)
-		var s string
+		var s strings.Builder
 		for i, c := range comps {
 			lc := strings.ToLower(c)
 			if slices.Index(terms, lc) != -1 {
 				if i == 0 {
-					s += lc
+					s.WriteString(lc)
 				} else {
-					s += strings.ToUpper(lc[:1]) + lc[1:]
+					s.WriteString(strings.ToUpper(lc[:1]) + lc[1:])
 				}
 			} else {
 				if i == 0 {
-					s += strings.ToLower(c[:1]) + c[1:]
+					s.WriteString(strings.ToLower(c[:1]) + c[1:])
 				} else {
-					s += c
+					s.WriteString(c)
 				}
 			}
 		}
-		return s
+		return s.String()
 	default:
 		panic("unknown case")
 	}
