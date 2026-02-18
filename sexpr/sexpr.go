@@ -10,25 +10,25 @@ import (
 )
 
 // Parse parses an s-expression from a slice of tokens.
-func Parse(tokens []tokeniser.Token) ([]interface{}, error) {
+func Parse(tokens []tokeniser.Token) ([]any, error) {
 	list, _, err := parseList(tokens)
 	return list, err
 }
 
-func parseList(tokens []tokeniser.Token) ([]interface{}, []tokeniser.Token, error) {
+func parseList(tokens []tokeniser.Token) ([]any, []tokeniser.Token, error) {
 	t := tokens[0]
 	if !(t.Type == tokeniser.Symbol && t.Value == "(") {
 		return nil, nil, fmt.Errorf("expected '(' (line %d)", t.Location.Line)
 	}
 	tokens = tokens[1:]
-	var list []interface{}
+	var list []any
 	for {
 		t = tokens[0]
 		if t.Type == tokeniser.Symbol && t.Value == ")" {
 			return list, tokens[1:], nil
 		}
 		var (
-			expr interface{}
+			expr any
 			err  error
 		)
 		expr, tokens, err = parseElem(tokens)
@@ -39,7 +39,7 @@ func parseList(tokens []tokeniser.Token) ([]interface{}, []tokeniser.Token, erro
 	}
 }
 
-func parseElem(tokens []tokeniser.Token) (interface{}, []tokeniser.Token, error) {
+func parseElem(tokens []tokeniser.Token) (any, []tokeniser.Token, error) {
 	t := tokens[0]
 	if t.Type == tokeniser.Symbol && t.Value == "(" {
 		return parseList(tokens)
@@ -70,7 +70,7 @@ func parseElem(tokens []tokeniser.Token) (interface{}, []tokeniser.Token, error)
 type String string
 
 // ParseString parses an s-expression.
-func ParseString(code string) ([]interface{}, error) {
+func ParseString(code string) ([]any, error) {
 	tokens, err := tokeniser.Tokenise(bufio.NewReader(strings.NewReader(code)), &tokeniser.Config{
 		IdentRunes:  []rune{'_', '-', '+', '/', '*', '<', '=', '>', '?', '!'},
 		CommentRune: '#',

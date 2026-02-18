@@ -24,7 +24,6 @@ func (m *Mux) Handle(path, method string, handler func(http.ResponseWriter, *htt
 func (m *Mux) ServeMux() *http.ServeMux {
 	mux := http.NewServeMux()
 	for path, methods := range m.handlers {
-		methods := methods
 		mux.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
 			h, ok := methods[req.Method]
 			if !ok {

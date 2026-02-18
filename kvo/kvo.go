@@ -2,8 +2,8 @@ package kvo
 
 // Coding is the KVC interface.
 type Coding interface {
-	Set(key string, value interface{}) bool
-	Get(key string) (interface{}, bool)
+	Set(key string, value any) bool
+	Get(key string) (any, bool)
 }
 
 // ObservingTime determines the observing time point.
@@ -18,23 +18,23 @@ const (
 
 // Observed represents an observable object.
 type Observed interface {
-	AddObserver(key string, ot ObservingTime, observer func(interface{}, interface{}))
+	AddObserver(key string, ot ObservingTime, observer func(any, any))
 }
 
 // Object is a dynamic observable object.
 type Object struct {
-	values         map[string]interface{}
-	observersPrior []func(interface{}, interface{})
-	observersPost  []func(interface{}, interface{})
+	values         map[string]any
+	observersPrior []func(any, any)
+	observersPost  []func(any, any)
 }
 
 // NewObject creates a new [Object].
 func NewObject() *Object {
-	return &Object{values: make(map[string]interface{})}
+	return &Object{values: make(map[string]any)}
 }
 
 // Set sets a property.
-func (obj *Object) Set(key string, value interface{}) bool {
+func (obj *Object) Set(key string, value any) bool {
 	oldVal := obj.values[key]
 	for _, obs := range obj.observersPrior {
 		obs(oldVal, value)
@@ -47,13 +47,13 @@ func (obj *Object) Set(key string, value interface{}) bool {
 }
 
 // Get gets a property.
-func (obj *Object) Get(key string) (interface{}, bool) {
+func (obj *Object) Get(key string) (any, bool) {
 	val, ok := obj.values[key]
 	return val, ok
 }
 
 // AddObserver adds an observer.
-func (obj *Object) AddObserver(key string, ot ObservingTime, observer func(interface{}, interface{})) {
+func (obj *Object) AddObserver(key string, ot ObservingTime, observer func(any, any)) {
 	switch ot {
 	case Prior:
 		obj.observersPrior = append(obj.observersPrior, observer)
