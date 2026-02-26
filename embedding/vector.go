@@ -1,8 +1,8 @@
 package embedding
 
 import (
-	"database/sql/driver"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"strconv"
 	"strings"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ sql.Scanner = (*Vector)(nil)
+	_ sql.Scanner   = (*Vector)(nil)
 	_ driver.Valuer = Vector(nil)
 )
 
