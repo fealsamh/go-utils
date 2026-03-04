@@ -19,17 +19,21 @@ type Migration struct {
 }
 
 // RunMigrations runs the migrations.
-func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration) error {
+func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName string) error {
+	if tableName == "" {
+		tableName = "migrations"
+	}
+
 	if _, err := db.ExecContext(ctx, `
-	CREATE TABLE IF NOT EXISTS migrations (num INT PRIMARY KEY, "desc" TEXT NOT NULL, hash BYTEA NOT NULL)`); err != nil {
+	CREATE TABLE IF NOT EXISTS `+tableName+` (num INT PRIMARY KEY, "desc" TEXT NOT NULL, hash BYTEA NOT NULL)`); err != nil {
 		return err
 	}
 	if _, err := db.ExecContext(ctx, `
-	CREATE INDEX IF NOT EXISTS idx_migrations_num ON migrations (num)`); err != nil {
+	CREATE INDEX IF NOT EXISTS idx_`+tableName+`_num ON `+tableName+` (num)`); err != nil {
 		return err
 	}
 
-	rows, err := db.QueryContext(ctx, `SELECT num, "desc", hash FROM migrations ORDER BY num`)
+	rows, err := db.QueryContext(ctx, `SELECT num, "desc", hash FROM `+tableName+` ORDER BY num`)
 	if err != nil {
 		return err
 	}
@@ -83,7 +87,7 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration) error {
 			return errors.Join(err, tx.Rollback())
 		}
 		if _, err := tx.ExecContext(ctx, `
-		INSERT INTO migrations (num, "desc", hash) VALUES ($1, $2, $3)`, m.Number, m.Description, hash[:]); err != nil {
+		INSERT INTO `+tableName+` (num, "desc", hash) VALUES ($1, $2, $3)`, m.Number, m.Description, hash[:]); err != nil {
 			return errors.Join(err, tx.Rollback())
 		}
 		if err := tx.Commit(); err != nil {
