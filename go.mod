@@ -8,7 +8,7 @@ require (
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/goleveldb v1.0.0
-	golang.org/x/mobile v0.0.0-20260520154334-0e4426e1883d
+	golang.org/x/mobile v0.0.0-20260529142300-ecb4cd65260a
 	google.golang.org/appengine/v2 v2.0.6
 	google.golang.org/grpc v1.81.1
 )
