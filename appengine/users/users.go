@@ -40,6 +40,9 @@ func resetCurrentUser() {
 
 // AddDevHandlers ...
 func AddDevHandlers(mux *http.ServeMux) {
+	if appengine.IsAppEngine() {
+		panic("no dev handlers should be used in production")
+	}
 	mux.HandleFunc("GET /_login_", func(w http.ResponseWriter, req *http.Request) {
 		d := req.URL.Query().Get("d")
 		setCurrentUser("abcd@email.dummy", "_local_id_", true)
