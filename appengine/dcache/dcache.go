@@ -5,28 +5,16 @@ import (
 	"errors"
 	"time"
 
-	"github.com/fealsamh/go-utils/nocopy"
-	"github.com/syndtr/goleveldb/leveldb"
 	"google.golang.org/appengine/v2"
 	"google.golang.org/appengine/v2/memcache"
 )
 
 var (
-	cacheDb *leveldb.DB
+	cacheDb = make(map[string][]byte)
 
 	// ErrCacheMiss ...
 	ErrCacheMiss = memcache.ErrCacheMiss
 )
-
-func init() {
-	if !appengine.IsAppEngine() {
-		db, err := leveldb.OpenFile("localcache.db", nil)
-		if err != nil {
-			panic(err)
-		}
-		cacheDb = db
-	}
-}
 
 // Set ...
 func Set(ctx context.Context, key string, value []byte) error {
@@ -36,7 +24,8 @@ func Set(ctx context.Context, key string, value []byte) error {
 			Value: value,
 		})
 	}
-	return cacheDb.Put(nocopy.Bytes(key), value, nil)
+	cacheDb[key] = value
+	return nil
 }
 
 // SetWithExpiration ...
@@ -48,7 +37,8 @@ func SetWithExpiration(ctx context.Context, key string, value []byte, expiration
 			Expiration: expiration,
 		})
 	}
-	return cacheDb.Put(nocopy.Bytes(key), value, nil)
+	cacheDb[key] = value
+	return nil
 }
 
 // Remove ...
@@ -62,7 +52,8 @@ func Remove(ctx context.Context, key string) error {
 		}
 		return nil
 	}
-	return cacheDb.Delete(nocopy.Bytes(key), nil)
+	delete(cacheDb, key)
+	return nil
 }
 
 // Get ...
@@ -77,12 +68,9 @@ func Get(ctx context.Context, key string) ([]byte, error) {
 		}
 		return item.Value, nil
 	}
-	val, err := cacheDb.Get(nocopy.Bytes(key), nil)
-	if err != nil {
-		if errors.Is(err, leveldb.ErrNotFound) {
-			return nil, ErrCacheMiss
-		}
-		return nil, err
+	val, ok := cacheDb[key]
+	if !ok {
+		return nil, ErrCacheMiss
 	}
 	return val, nil
 }
