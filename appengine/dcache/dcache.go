@@ -3,6 +3,7 @@ package dcache
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/fealsamh/go-utils/nocopy"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -33,6 +34,18 @@ func Set(ctx context.Context, key string, value []byte) error {
 		return memcache.Set(ctx, &memcache.Item{
 			Key:   key,
 			Value: value,
+		})
+	}
+	return cacheDb.Put(nocopy.Bytes(key), value, nil)
+}
+
+// SetWithExpiration ...
+func SetWithExpiration(ctx context.Context, key string, value []byte, expiration time.Duration) error {
+	if appengine.IsAppEngine() {
+		return memcache.Set(ctx, &memcache.Item{
+			Key:        key,
+			Value:      value,
+			Expiration: expiration,
 		})
 	}
 	return cacheDb.Put(nocopy.Bytes(key), value, nil)
