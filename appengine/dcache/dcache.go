@@ -3,6 +3,7 @@ package dcache
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"google.golang.org/appengine/v2"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	cacheDb = make(map[string][]byte)
+	cacheDb sync.Map
 
 	// ErrCacheMiss ...
 	ErrCacheMiss = memcache.ErrCacheMiss
@@ -24,7 +25,7 @@ func Set(ctx context.Context, key string, value []byte) error {
 			Value: value,
 		})
 	}
-	cacheDb[key] = value
+	cacheDb.Store(key, value)
 	return nil
 }
 
@@ -37,7 +38,7 @@ func SetWithExpiration(ctx context.Context, key string, value []byte, expiration
 			Expiration: expiration,
 		})
 	}
-	cacheDb[key] = value
+	cacheDb.Store(key, value)
 	return nil
 }
 
@@ -52,7 +53,7 @@ func Remove(ctx context.Context, key string) error {
 		}
 		return nil
 	}
-	delete(cacheDb, key)
+	cacheDb.Delete(key)
 	return nil
 }
 
@@ -68,9 +69,9 @@ func Get(ctx context.Context, key string) ([]byte, error) {
 		}
 		return item.Value, nil
 	}
-	val, ok := cacheDb[key]
+	val, ok := cacheDb.Load(key)
 	if !ok {
 		return nil, ErrCacheMiss
 	}
-	return val, nil
+	return val.([]byte), nil
 }
