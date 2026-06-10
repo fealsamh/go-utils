@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"time"
 )
 
 // SetObject ...
@@ -13,6 +14,15 @@ func SetObject[T any](ctx context.Context, key string, obj *T) error {
 		return err
 	}
 	return Set(ctx, key, buf.Bytes())
+}
+
+// SetObjectWithExpiration ...
+func SetObjectWithExpiration[T any](ctx context.Context, key string, obj *T, expiration time.Duration) error {
+	var buf bytes.Buffer
+	if err := gob.NewEncoder(&buf).Encode(obj); err != nil {
+		return err
+	}
+	return SetWithExpiration(ctx, key, buf.Bytes(), expiration)
 }
 
 // GetObject ...
