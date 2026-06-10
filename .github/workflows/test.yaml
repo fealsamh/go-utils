@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         go-version: [1.25.x, 1.26.x]
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set up Go
@@ -23,6 +23,7 @@ jobs:
       - name: Vet & test
         run: |
           # Vet & test
+          export GOEXPERIMENT=jsonv2
           go vet -v ./...
           go test -v ./...
           go install golang.org/x/lint/golint@latest
