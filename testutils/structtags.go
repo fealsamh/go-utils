@@ -37,7 +37,7 @@ func CheckStructTags(tagAttr string, cas Case, typ reflect.Type, terms ...string
 			return fmt.Errorf("nil '%s' struct tag for %s.%s", tagAttr, typ, f.Name)
 		}
 		if !f.Anonymous {
-			tagName := strings.Split(tag, ",")[0]
+			tagName, _, _ := strings.Cut(tag, ",")
 			if f.Name == "XMLName" {
 				typName := convertCase(cas, typ.Name())
 				comps := strings.Split(tagName, " ")
