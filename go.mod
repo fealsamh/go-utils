@@ -1,13 +1,13 @@
 module github.com/fealsamh/go-utils
 
-go 1.25.0
+go 1.27
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/mobile v0.0.0-20260602190626-68735029466e
+	golang.org/x/mobile v0.0.0-20260611195102-4dd8f1dbf5d2
 	google.golang.org/appengine/v2 v2.0.6
 	google.golang.org/grpc v1.81.1
 )
@@ -22,7 +22,7 @@ require (
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260608224507-4308a22a1bab // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260618152121-87f3d3e198d3 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

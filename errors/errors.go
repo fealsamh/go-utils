@@ -2,7 +2,7 @@ package errors
 
 import (
 	"database/sql"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"io"
 	"net/http"
@@ -62,7 +62,7 @@ func FromError(err error) (*WrappedError, bool) {
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
-	var jsonErr *json.SyntaxError
+	var jsonErr *json.SemanticError
 	if errors.As(err, &jsonErr) {
 		return &WrappedError{err, InvalidArgument}, true
 	}
@@ -118,7 +118,7 @@ type jsonError struct {
 // WriteHTTPErrorJSON writes the HTTP error as JSON.
 func WriteHTTPErrorJSON(w http.ResponseWriter, err error) {
 	WriteHTTPHeader(w, err)
-	json.NewEncoder(w).Encode(jsonError{err.Error()})
+	json.MarshalWrite(w, jsonError{err.Error()})
 }
 
 // WriteHTTPHeader writes the HTTP header.
