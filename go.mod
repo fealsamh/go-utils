@@ -1,6 +1,6 @@
 module github.com/fealsamh/go-utils
 
-go 1.25.0
+go 1.27
 
 require (
 	github.com/google/uuid v1.6.0
