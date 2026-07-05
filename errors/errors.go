@@ -61,8 +61,7 @@ func FromError(err error) (*WrappedError, bool) {
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
-	var jsonErr *json.SemanticError
-	if errors.As(err, &jsonErr) {
+	if _, ok := errors.AsType[*json.SemanticError](err); ok {
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
