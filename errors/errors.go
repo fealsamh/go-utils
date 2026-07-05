@@ -11,6 +11,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const (
+	invalidUUIDErrMessage = "invalid uuid"
+)
+
 // Error is an error with an error code.
 type Error struct {
 	message string
@@ -54,11 +58,11 @@ func FromError(err error) (*WrappedError, bool) {
 	case errors.Is(err, sql.ErrNoRows):
 		return &WrappedError{err, NotFound}, true
 
-	// case uuid.IsInvalidLengthError(err):
-	// 	return &WrappedError{err, InvalidArgument}, true
-
-	case err.Error() == "invalid UUID format":
+	case err.Error() == invalidUUIDErrMessage:
 		return &WrappedError{err, InvalidArgument}, true
+
+		// case err.Error() == "invalid UUID format":
+		// 	return &WrappedError{err, InvalidArgument}, true
 	}
 
 	if _, ok := errors.AsType[*json.SemanticError](err); ok {
