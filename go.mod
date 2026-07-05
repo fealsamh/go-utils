@@ -3,7 +3,6 @@ module github.com/fealsamh/go-utils
 go 1.27
 
 require (
-	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/stretchr/testify v1.11.1

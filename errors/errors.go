@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -55,8 +54,8 @@ func FromError(err error) (*WrappedError, bool) {
 	case errors.Is(err, sql.ErrNoRows):
 		return &WrappedError{err, NotFound}, true
 
-	case uuid.IsInvalidLengthError(err):
-		return &WrappedError{err, InvalidArgument}, true
+	// case uuid.IsInvalidLengthError(err):
+	// 	return &WrappedError{err, InvalidArgument}, true
 
 	case err.Error() == "invalid UUID format":
 		return &WrappedError{err, InvalidArgument}, true
