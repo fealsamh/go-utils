@@ -24,8 +24,7 @@ func CheckStructTags(tagAttr string, cas Case, typ reflect.Type, terms ...string
 	for typ.Kind() == reflect.Pointer {
 		typ = typ.Elem()
 	}
-	for i := 0; i < typ.NumField(); i++ {
-		f := typ.Field(i)
+	for f := range typ.Fields() {
 		if slices.Index([]string{"0", "no", "false"}, f.Tag.Get("check")) != -1 {
 			continue
 		}

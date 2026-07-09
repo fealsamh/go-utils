@@ -62,8 +62,7 @@ func FromError(err error) (*WrappedError, bool) {
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
-	var jsonErr *json.SyntaxError
-	if errors.As(err, &jsonErr) {
+	if _, ok := errors.AsType[*json.SyntaxError](err); ok {
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
