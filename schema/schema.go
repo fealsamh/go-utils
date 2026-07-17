@@ -3,30 +3,30 @@ package schema
 import (
 	"encoding/json"
 	"reflect"
+	"sync"
 
 	"github.com/google/jsonschema-go/jsonschema"
 )
 
 var (
-	schemas = make(map[reflect.Type]*jsonschema.Schema)
+	// schemas = make(map[reflect.Type]*jsonschema.Resolved)
+	schemas sync.Map
 )
 
 // Validate validates JSON data against a schema.
 func Validate[T any](b []byte) error {
 	typ := reflect.TypeFor[T]()
-	sch, ok := schemas[typ]
+	rs, ok := schemas.Load(typ)
 	if !ok {
-		var err error
-		sch, err = jsonschema.ForType(typ, nil)
+		sch, err := jsonschema.ForType(typ, nil)
 		if err != nil {
 			return err
 		}
-		schemas[typ] = sch
-	}
-
-	rs, err := sch.Resolve(nil)
-	if err != nil {
-		return err
+		rs, err = sch.Resolve(nil)
+		if err != nil {
+			return err
+		}
+		schemas.Store(typ, rs)
 	}
 
 	var m map[string]interface{}
@@ -34,5 +34,5 @@ func Validate[T any](b []byte) error {
 		return err
 	}
 
-	return rs.Validate(m)
+	return rs.(*jsonschema.Resolved).Validate(m)
 }
