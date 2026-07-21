@@ -29,7 +29,7 @@ func Validate[T any](b []byte) error {
 		schemas.Store(typ, rs)
 	}
 
-	var m map[string]interface{}
+	var m map[string]any
 	if err := json.Unmarshal(b, &m); err != nil {
 		return err
 	}
