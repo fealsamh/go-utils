@@ -2,6 +2,7 @@ package errors
 
 import (
 	"database/sql"
+	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"errors"
 	"io"
@@ -65,6 +66,9 @@ func FromError(err error) (*WrappedError, bool) {
 		// 	return &WrappedError{err, InvalidArgument}, true
 	}
 
+	if _, ok := errors.AsType[*jsontext.SyntacticError](err); ok {
+		return &WrappedError{err, InvalidArgument}, true
+	}
 	if _, ok := errors.AsType[*json.SemanticError](err); ok {
 		return &WrappedError{err, InvalidArgument}, true
 	}
