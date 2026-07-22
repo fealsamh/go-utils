@@ -11,6 +11,10 @@ import (
 	"sort"
 )
 
+const (
+	defaultMigrationsTable = "migrations"
+)
+
 // Migration is a database migration.
 type Migration struct {
 	Number      int
@@ -21,7 +25,7 @@ type Migration struct {
 // RunMigrations runs the migrations.
 func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName string) error {
 	if tableName == "" {
-		tableName = "migrations"
+		tableName = defaultMigrationsTable
 	}
 
 	if _, err := db.ExecContext(ctx, `
