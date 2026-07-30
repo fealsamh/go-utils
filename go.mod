@@ -1,6 +1,6 @@
 module github.com/fealsamh/go-utils
 
-go 1.26.5
+go 1.27
 
 require (
 	github.com/google/jsonschema-go v0.4.3
