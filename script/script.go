@@ -3,9 +3,9 @@ package script
 import (
 	"fmt"
 	"reflect"
+	"uuid"
 
 	"github.com/fealsamh/go-utils/sexpr"
-	"github.com/google/uuid"
 )
 
 // EvalContext is a node of a context in-tree.
