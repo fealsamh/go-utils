@@ -2,14 +2,18 @@ package errors
 
 import (
 	"database/sql"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"io"
 	"net/http"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+)
+
+const (
+	invalidUUIDErrMessage = "invalid uuid"
 )
 
 // Error is an error with an error code.
@@ -55,14 +59,17 @@ func FromError(err error) (*WrappedError, bool) {
 	case errors.Is(err, sql.ErrNoRows):
 		return &WrappedError{err, NotFound}, true
 
-	case uuid.IsInvalidLengthError(err):
+	case err.Error() == invalidUUIDErrMessage:
 		return &WrappedError{err, InvalidArgument}, true
 
-	case err.Error() == "invalid UUID format":
-		return &WrappedError{err, InvalidArgument}, true
+		// case err.Error() == "invalid UUID format":
+		// 	return &WrappedError{err, InvalidArgument}, true
 	}
 
-	if _, ok := errors.AsType[*json.SyntaxError](err); ok {
+	if _, ok := errors.AsType[*jsontext.SyntacticError](err); ok {
+		return &WrappedError{err, InvalidArgument}, true
+	}
+	if _, ok := errors.AsType[*json.SemanticError](err); ok {
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
@@ -117,7 +124,7 @@ type jsonError struct {
 // WriteHTTPErrorJSON writes the HTTP error as JSON.
 func WriteHTTPErrorJSON(w http.ResponseWriter, err error) {
 	WriteHTTPHeader(w, err)
-	json.NewEncoder(w).Encode(jsonError{err.Error()})
+	json.MarshalWrite(w, jsonError{err.Error()})
 }
 
 // WriteHTTPHeader writes the HTTP header.
