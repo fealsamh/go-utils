@@ -7,7 +7,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/mobile v0.0.0-20260812174124-2f419b2fb945
+	golang.org/x/mobile v0.0.0-20260813181013-1960c775504c
 	google.golang.org/appengine/v2 v2.0.6
 	google.golang.org/grpc v1.83.0
 )
