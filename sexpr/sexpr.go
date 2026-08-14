@@ -80,11 +80,3 @@ func ParseString(code string) ([]any, error) {
 	}
 	return Parse(tokens)
 }
-
-// Must panics if `err` isn't `nil`.
-func Must[T any](data T, err error) T {
-	if err != nil {
-		panic(err)
-	}
-	return data
-}
