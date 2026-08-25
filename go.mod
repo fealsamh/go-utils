@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/mobile v0.0.0-20260821190718-4776eadac327
 	google.golang.org/appengine/v2 v2.0.6
-	google.golang.org/grpc v1.83.1
+	google.golang.org/grpc v1.83.2
 )
 
 require (
