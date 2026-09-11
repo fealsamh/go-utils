@@ -7,7 +7,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"sort"
 )
 
@@ -23,7 +23,7 @@ type Migration struct {
 }
 
 // RunMigrations runs the migrations.
-func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName string) error {
+func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName string, logger *slog.Logger) error {
 	if tableName == "" {
 		tableName = defaultMigrationsTable
 	}
@@ -81,7 +81,7 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName st
 
 	for ; i < len(ms); i++ {
 		m := ms[i]
-		log.Printf("running migration %d: %s", m.Number, m.Description)
+		logger.Info("running migration", slog.Int("number", m.Number), slog.String("description", m.Description))
 		hash := sha256.Sum256([]byte(m.Script))
 		tx, err := db.Begin()
 		if err != nil {
