@@ -5,7 +5,7 @@ go 1.27
 require (
 	github.com/google/jsonschema-go v0.4.3
 	github.com/lib/pq v1.12.3
-	github.com/modelcontextprotocol/go-sdk v1.7.0
+	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/mobile v0.0.0-20260908204917-8b95e45f8d3e
 	google.golang.org/appengine/v2 v2.0.6
@@ -22,6 +22,6 @@ require (
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260908043556-f8649ddbbfe6 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260911204522-f61a6ca850bd // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
