@@ -6,8 +6,8 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -55,10 +55,7 @@ func FromError(err error) (*WrappedError, bool) {
 	case errors.Is(err, sql.ErrNoRows):
 		return &WrappedError{err, NotFound}, true
 
-	case uuid.IsInvalidLengthError(err):
-		return &WrappedError{err, InvalidArgument}, true
-
-	case err.Error() == "invalid UUID format":
+	case isInvalidUUIDMessage(err.Error()):
 		return &WrappedError{err, InvalidArgument}, true
 	}
 
@@ -145,4 +142,9 @@ func httpStatus(err error) (int, bool) {
 		}
 	}
 	return 0, false
+}
+
+// isInvalidUUIDMessage reports whether the message comes from a failed uuid parse.
+func isInvalidUUIDMessage(msg string) bool {
+	return msg == "invalid uuid" || strings.HasPrefix(msg, "invalid UUID")
 }

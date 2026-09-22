@@ -1,9 +1,8 @@
 module github.com/mailstepcz/go-utils
 
-go 1.25.0
+go 1.27.1
 
 require (
-	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/goleveldb v1.0.0
