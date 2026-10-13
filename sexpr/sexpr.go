@@ -17,7 +17,7 @@ func Parse(tokens []tokeniser.Token) ([]any, error) {
 
 func parseList(tokens []tokeniser.Token) ([]any, []tokeniser.Token, error) {
 	t := tokens[0]
-	if !(t.Type == tokeniser.Symbol && t.Value == "(") {
+	if t.Type != tokeniser.Symbol || t.Value != "(" {
 		return nil, nil, fmt.Errorf("expected '(' (line %d)", t.Location.Line)
 	}
 	tokens = tokens[1:]
