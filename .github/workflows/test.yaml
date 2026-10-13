@@ -20,6 +20,8 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout out code
         uses: actions/checkout@v7
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
       - name: Vet & test
         run: |
           # Vet & test
