@@ -112,9 +112,10 @@ func convertToGRPC(err error) error {
 }
 
 // WriteHTTPError writes the HTTP error.
-func WriteHTTPError(w http.ResponseWriter, err error) {
+func WriteHTTPError(w http.ResponseWriter, err error) error {
 	WriteHTTPHeader(w, err)
-	io.WriteString(w, err.Error())
+	_, err = io.WriteString(w, err.Error())
+	return err
 }
 
 type jsonError struct {
@@ -122,9 +123,9 @@ type jsonError struct {
 }
 
 // WriteHTTPErrorJSON writes the HTTP error as JSON.
-func WriteHTTPErrorJSON(w http.ResponseWriter, err error) {
+func WriteHTTPErrorJSON(w http.ResponseWriter, err error) error {
 	WriteHTTPHeader(w, err)
-	json.MarshalWrite(w, jsonError{err.Error()})
+	return json.MarshalWrite(w, jsonError{err.Error()})
 }
 
 // WriteHTTPHeader writes the HTTP header.

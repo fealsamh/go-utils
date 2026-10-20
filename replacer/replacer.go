@@ -31,7 +31,6 @@ func Replace(tmpl string, repl map[string]string) string {
 				state = 0
 			}
 		}
-		i++
 	}
 	return sb.String()
 }
