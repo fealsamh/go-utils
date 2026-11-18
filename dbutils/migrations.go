@@ -2,13 +2,14 @@ package dbutils
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"crypto/sha256"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
-	"sort"
+	"slices"
 )
 
 const (
@@ -27,6 +28,9 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName st
 	if tableName == "" {
 		tableName = defaultMigrationsTable
 	}
+	if logger == nil {
+		logger = slog.Default()
+	}
 
 	if _, err := db.ExecContext(ctx, `
 	CREATE TABLE IF NOT EXISTS `+tableName+` (num INT PRIMARY KEY, "desc" TEXT NOT NULL, hash BYTEA NOT NULL)`); err != nil {
@@ -43,8 +47,8 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName st
 	}
 	defer rows.Close()
 
-	sort.Slice(ms, func(i, j int) bool {
-		return ms[i].Number < ms[j].Number
+	slices.SortFunc(ms, func(m1, m2 Migration) int {
+		return cmp.Compare(m1.Number, m2.Number)
 	})
 
 	var i int
@@ -76,6 +80,9 @@ func RunMigrations(ctx context.Context, db *sql.DB, ms []Migration, tableName st
 	}
 
 	if err := rows.Err(); err != nil {
+		return err
+	}
+	if err := rows.Close(); err != nil {
 		return err
 	}
 
